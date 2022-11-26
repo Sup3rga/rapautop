@@ -10,15 +10,26 @@ export default class Page extends React.Component{
         super(props);
     }
 
+    componentDidMount() {
+        window.addEventListener('scroll', (e)=>{
+            Events.emit("scroll", {
+                top: window.scrollY,
+                left: window.scrollX
+            });
+        });
+    }
+
     render(){
         console.log('[Menu]',this.props.menu);
         return (
             <>
                 {this.props.menu}
                 {this.props.search}
-                <main className="ui-container ui-size-fluid" onClick={()=>{
-                    Events.emit("close-search");
-                }}>
+                <main className="ui-container ui-size-fluid"
+                      onClick={()=>{
+                        Events.emit("close-search");
+                      }}
+                >
                     {this.props.header}
                     {this.props.children}
                     {this.props.footer}

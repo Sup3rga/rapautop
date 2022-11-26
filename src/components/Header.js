@@ -65,6 +65,35 @@ class Banner extends React.Component{
 
 export default class Header extends React.Component{
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            showFilter: false
+        };
+    }
+
+    componentDidMount() {
+        Events.on('show-header-icon', (e)=>{
+            if(e == 'filter'){
+                this.setState((state)=>{
+                    return {
+                        ...state,
+                        showFilter: true
+                    }
+                });
+            }
+        }).on('hide-header-icon', (e)=>{
+            if(e == 'filter'){
+                this.setState((state)=>{
+                    return {
+                        ...state,
+                        showFilter: false
+                    }
+                });
+            }
+        });
+    }
+
     render(){
         return <header className="ui-container ui-size-fluid header ui-header ui-flex ui-vertical-center">
             <div className="ui-container ui-size-8 ui-md-size-4">
@@ -74,6 +103,14 @@ export default class Header extends React.Component{
                 <HeaderNav data={this.props.links}/>
             </div>
             <div className="ui-md-container ui-size-4 ui-md-size-2 ui-horizontal-right icon-zone">
+                {
+                    this.state.showFilter ?
+                    <Icon mode="ion" icon="android-options" onClick={e => {
+                        Events.emit('show-filter-box')
+                    }}/>
+                    :
+                    null
+                }
                 <Icon mode="ion" icon="ios-search-strong" onClick={e => {
                     Events.emit('open-search')
                 }}/>

@@ -440,6 +440,9 @@ footer{
     background-color: #fff;
   }
 }
+.filter-box{
+  z-index: 5;
+}
 
 @media (min-width: 768px) {
   .trending .article-thumb .metadata{

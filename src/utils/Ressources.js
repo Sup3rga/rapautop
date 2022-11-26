@@ -94,7 +94,7 @@ export default class Ressources{
             "all": "Tout",
             "musique": "Musique",
             "actualites": "Actualités",
-            "Hip-Hop": "Hip-hop",
+            "hip-hop": "Hip-hop",
             "clip": "Clip"
         };
     }
@@ -105,27 +105,32 @@ export default class Ressources{
                 title: "50 Cent sur le podium...",
                 subtitle: "La nuit dernière était épique. Mais à savoir comment, il faut lire la suite pour savoir.",
                 caption: './assets/captions/rapcap004.jpg',
+                categorie: "musique",
                 date: '2022-11-13'
             },{
                 title: "La victoire de je ne sais qui !",
                 subtitle: "Découvrez ce qui s'est passé lors de la cérémonie de BET",
                 caption: './assets/captions/rapcap006.jpg',
+                categorie: "actualites",
                 date: '2022-11-06'
             },{
                 title: "La victoire de je ne sais qui !",
                 subtitle: "Découvrez ce qui s'est passé lors de la cérémonie de BET",
                 caption: './assets/captions/rapcap007.jpg',
+                categorie: "actualites",
                 date: '2022-11-06'
             },{
                 title: "La victoire de je ne sais qui !",
                 subtitle: "Découvrez ce qui s'est passé lors de la cérémonie de BET",
                 caption: './assets/captions/rapcap008.jpg',
+                categorie: "hip-hop",
                 date: '2022-11-06'
             },{
                 title: "Jay-z est de retour pour...",
                 subtitle: "Par manque d'inspiration pour écrire des concepts d'articles, nous voilà quelque part " +
                     "sur Jay-z pour dire un truc, quoi !  ",
                 caption: './assets/captions/rapcap009.jpg',
+                categorie: "actualites",
                 date: '2022-11-06'
             }
         ];

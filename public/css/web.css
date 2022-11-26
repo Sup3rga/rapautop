@@ -515,18 +515,23 @@ footer .end {
   background-color: #fff;
 }
 
+/* line 443, ../../sass/web.scss */
+.filter-box {
+  z-index: 5;
+}
+
 @media (min-width: 768px) {
-  /* line 446, ../../sass/web.scss */
+  /* line 449, ../../sass/web.scss */
   .trending .article-thumb .metadata .title {
     padding: .3em 0;
     font-size: 1.6em;
   }
-  /* line 450, ../../sass/web.scss */
+  /* line 453, ../../sass/web.scss */
   .trending .article-thumb .metadata .subtitle {
     font-size: 1em;
     line-height: 1.8em;
   }
-  /* line 454, ../../sass/web.scss */
+  /* line 457, ../../sass/web.scss */
   .trending .article-thumb .metadata .date {
     padding: .4em;
   }
