@@ -1,0 +1,719 @@
+/**
+    root
+ */
+:root{
+  --theme: #ffffff;
+  --theme-2: #000;
+  --theme-global: #fffdf4;
+  --color: rgb(0, 0, 0);
+  --caroussel-background: #eee;
+  --footer-background: #393128;
+  --font-family: Roboto;
+  --font-family-li: Lexend;
+  --font-family-li-active: Lexend-Medium;
+  --font-family-banner: Poppins-Bold;
+  --font-family-button: Lexend-Medium;
+  --font-family-paragraph: Merriweather-Light;
+  --font-size: 1em;
+  --font-size-banner: 1.4em;
+  --nav-li-space: 1em;
+  --caroussel-height: 90vh;
+  --header-height: 50px;
+  --caroussel-nav-margin: 1em;
+  --caroussel-indicator-height: 40px;
+  --caroussel-text-background0: transparent;
+  --caroussel-text-background1: #333;
+  --caroussel-text-color: white;
+  --caroussel-text-font: Merriweather-Light;
+  --caroussel-text-font2: Merriweather;
+  --paragraph-line: 1.5em;
+  --header-nav-li-size: .9em;
+  --ui-button-padding: .8em;
+}
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  position: relative;
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+}
+/**
+    Display
+ */
+body{
+  background-color: var(--theme-global);
+}
+.ui-container{
+  display: inline-flex;
+  flex-wrap: wrap;
+  white-space: normal;
+}
+.ui-container.ui-unwrap{
+  flex-wrap: nowrap; 
+}
+.ui-element{
+  display: inline-block;
+  white-space: normal;
+}
+.ui-block{
+  display: block;
+  white-space: normal;
+}
+.ui-element, .ui-block {
+  &.ui-flex {
+    display: inline-flex;
+  }
+}
+.ui-hide{
+  display: none;
+}
+.ui-nowrap{
+  white-space: nowrap;
+}
+
+.ui-scroll{
+  overflow: auto;
+}
+.ui-no-scroll{
+  overflow: hidden;
+}
+.ui-scroll-y{
+  overflow: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.ui-no-scroll-y{
+  overflow-y: hidden;
+}
+.ui-scroll-x{
+  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.ui-no-scroll-y{
+  overflow-x: hidden;
+}
+
+.ui-vertical-center{
+  vertical-align: middle;
+}
+.ui-horizontal-center{
+  text-align: center;
+}
+.ui-vertical-top{
+  vertical-align: top;
+}
+.ui-horizontal-left{
+  text-align: left;
+}
+.ui-vertical-bottom{
+  vertical-align: bottom;
+}
+.ui-horizontal-right{
+  text-align: right;
+}
+.ui-all-center{
+  vertical-align: middle;
+  text-align: center;
+}
+.ui-horizontal-justify{
+  text-align: justify;
+}
+
+.ui-flex, .ui-container{
+  &.ui-wrap{
+    flex-wrap: wrap;
+  }
+  &.ui-unwrap{
+    flex-wrap: nowrap;
+  }
+  &.ui-column{
+    flex-direction: column;
+  }
+  &.ui-column-reverse{
+    flex-direction: column-reverse;
+  }
+  &.ui-row{
+    flex-direction: row;
+  }
+  &.ui-row-reverse{
+    flex-direction: row-reverse;
+  }
+  &.ui-vertical-center{
+    align-items: center;
+  }
+  &.ui-horizontal-center{
+    justify-content: center;
+  }
+  &.ui-vertical-top{
+    align-items: flex-start;
+  }
+  &.ui-horizontal-left{
+    justify-content: left;
+  }
+  &.ui-vertical-bottom{
+    align-items: flex-end;
+  }
+  &.ui-horizontal-right{
+    justify-content: right;
+  }
+  &.ui-all-center{
+    align-items: center;
+    justify-content: center;
+  }
+  &.ui-spaced{
+    justify-content: space-between;
+  }
+}
+.ui-relative{
+  position: relative;
+}
+.ui-absolute{
+  position: absolute;
+}
+.ui-fixed{
+  position: fixed;
+}
+
+.ui-relative, .ui-absolute, .ui-fixed{
+  &.ui-left-close{
+    left: 0;
+  }
+  &.ui-right-close{
+    right: 0;
+  }
+  &.ui-bottom-close{
+    bottom: 0;
+  }
+  &.ui-top-close{
+    top: 0;
+  }
+  &.ui-vertical-close{
+    top: 0;
+    bottom: 0;
+  }
+  &.ui-horizontal-close{
+    left: 0;
+    right: 0;
+  }
+  &.ui-all-close{
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}
+
+/**
+    Design
+ */
+h1{
+  font-size: 1.8em;
+  font-family: Poppins-Bold;
+}
+.ui-image{
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  &.ui-image-size-contain{
+   background-size: contain;
+  }
+  &.ui-shadow-effect{
+    filter: drop-shadow(0 0 2px var(--theme));
+  }
+  &.ui-vertical-top{
+    background-position: top;
+  }
+}
+.ui-nav li{
+  list-style-type: none;
+  display: inline-block;
+  padding: .6em var(--nav-li-space);
+  font-family: var(--font-family-li);
+  font-size: var(--header-nav-li-size);
+  cursor: pointer;
+  a{
+    text-decoration: none;
+    color: inherit;
+    font-family: inherit;
+  }
+  &.active{
+    font-family: var(--font-family-li-active);
+    position: relative;
+  }
+}
+.ui-header{
+  padding: 0 .4em;
+  height: var(--header-height);
+  color: var(--color);
+  .ui-banner{
+    font-family: var(--font-family-banner);
+    font-size: var(--font-size-banner);
+    padding: 0 1em;
+    a{
+      font-family: inherit;
+      font-size: inherit;
+      text-decoration: none;
+      color: inherit;
+    }
+  }
+  .ui-nav{
+    li.active:after{
+      content: " ";
+      position: absolute;
+      width: 100%;
+      box-shadow: 0 0 2px 0 var(--theme-2);
+      border-radius: .3em .3em .1em .1em;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      background-color: var(--theme);
+    }
+  }
+}
+.ui-icon{
+  font-size: 1.3em;
+}
+.ui-paragraph{
+  line-height: var(--paragraph-line);
+  font-family: var(--font-family-paragraph);
+  padding: 2em;
+}
+.ui-button{
+  padding: var(--ui-button-padding);
+  font-family: var(--font-family-button);
+  color: var(--theme-color);
+  border: 0;
+  box-shadow: 0 2px 3px 0 #777;
+  border-radius: .2em;
+  cursor: pointer;
+  &.ui-primary-theme{
+    background-color: var(--theme);
+    color: var(--theme-2);
+    box-shadow: 0 2px 3px 0 var(--theme-2);
+  }
+  &:focus{
+    box-shadow: 0 2px 3px 0 #ccc;
+  }
+  &.light{
+    background-color: rgba(200,200,200,.1);
+    border: 0;
+  }
+}
+.ui-combo-button{
+  overflow: hidden;
+  border-radius: 2em;
+  background-color: var(--theme);
+  color: var(--theme-2);
+  box-shadow: 0 1px 3px 1px #ccc;
+  width: auto;
+}
+.ui-combo-button .ui-button{
+  background-color: unset;
+  border-radius: 2em;
+  padding: .4em 1em;
+  box-shadow: unset;
+  border: 0;
+}
+.ui-combo-button .ui-button.active{
+  background-color: var(--theme-2);
+  color: var(--theme);
+  font-family: Poppins-Bold;
+  border: 0;
+}
+.ui-caroussel{
+  height: var(--caroussel-height);
+  background-color: var(--caroussel-background);
+  border-radius: .4em;
+  overflow: hidden;
+  .ui-caroussel-nav{
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.4em;
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    border: 0;
+    box-shadow: 0 .5px 3px 0 var(--theme-2);
+  }
+  .ui-caroussel-nav.prev{
+    left: var(--caroussel-nav-margin);
+  }
+  .ui-caroussel-nav.next{
+    right: var(--caroussel-nav-margin);
+  }
+  .ui-caroussel-indicator{
+    position: absolute;
+    bottom: var(--caroussel-nav-margin);
+    right: var(--caroussel-nav-margin);
+    height: var(--caroussel-indicator-height);
+    background-color: rgba(200,200,200,0.1);
+    border-radius: 1em;
+    z-index: 2;
+    .ui-caroussel-indicator-dot{
+      width: 20px;
+      height: 20px;
+      border-radius: 100%;
+      margin: 0 var(--caroussel-nav-margin);
+      position: relative;
+      &.active{
+        border: 1px solid var(--theme);
+      }
+      &:after{
+        content: " ";
+        display: inline-block;
+        position: relative;
+        width: 7px;
+        height: 7px;
+        border-radius: 100%;
+        background-color: var(--theme-2);
+      }
+    }
+  }
+  .ui-caroussel-wrapper{
+    height: inherit;
+    white-space: nowrap;
+    .ui-caroussel-slide{
+      height: inherit;
+      position: relative;
+      .ui-component{
+        height: inherit;
+      }
+      &.ui-image-first{
+        .ui-image{
+          height: inherit;
+          width: inherit;
+        }
+        .ui-text{
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          padding: .8em;
+          padding-top: 2em;
+          font-family: var(--caroussel-text-font);
+          color: var(--caroussel-text-color);
+          background-image: linear-gradient(var(--caroussel-text-background0), var(--caroussel-text-background1));
+          h1{
+            font-family: var(--caroussel-text-font2);
+            padding: .4em 0;
+          }
+          p{
+            padding: .4em;
+            line-height: 1.5em;
+          }
+        }
+      }
+    }
+  }
+}
+.ui-field{
+  background-color: #ddd;
+  padding: .2em;
+  border-radius: .3em;
+  input,select,textarea{
+    background-color: unset;
+    border: 0;
+    padding: .4em;
+    outline: none;
+    overflow: hidden;
+    font-family: inherit;
+    display: block;
+    height: 100%;
+  }
+}
+
+/**
+    Dimensions
+ */
+.ui-size-fluid{
+  width: 100%;
+}
+.ui-fluid{
+  width: 100%;
+  height: 100%;
+}
+.ui-vfluid{
+  width: 100vw;
+  height: 100vh;
+}
+.ui-fluid-vwidth{
+  width: 100vw;
+}
+//Width
+@for  $i from 1 through 12 {
+  .ui-size-#{$i}{width: #{100% * $i/ 12};}
+}
+//Height
+.ui-fluid-height{
+  height: 100%;
+}
+.ui-fluid-vheight{
+  height: 100vh;
+}
+@for $i from 1 through 12 {
+  .ui-height-#{$i}{
+    height: #{100% * $i / 12};
+  }
+  .ui-vheight-#{$i}{
+    height: #{100vh * $i / 12};;
+  }
+}
+//Margin
+@for  $i from 1 through 12 {
+  .ui-mt-#{$i}{ margin-top: #{$i}em;}
+  .ui-mb-#{$i}{ margin-bottom: #{$i}em;}
+}
+//Padding
+@for  $i from 1 through 12 {
+  .ui-pt-#{$i}{ padding-top: #{$i}em;}
+  .ui-pb-#{$i}{ padding-bottom: #{$i}em;}
+}
+
+/*
+  -- NEW --
+*/
+.ui-input{
+  border: 0;
+  padding: .4em;
+  border-radius: .4em;
+  box-shadow: 0 0 2px 0 #333;
+  outline: none;
+}
+.ui-input:hover{
+  box-shadow: 0 0 4px 0 var(--theme);
+}
+
+.ui-input-group{
+  padding: .4em;
+  border-radius: .4em;
+  display: flex;
+  background-color: white;
+  box-shadow: 0 0 2px 0 #333;
+}
+
+.ui-input-group .ui-input,
+.ui-input-group .ui-button{
+  box-shadow: unset;
+  border-radius: 0;
+  border: 0;
+  /* background-color: unset; */
+}
+
+$sizes : 480px, 768px, 992px, 1200px;
+$prefixes: sm, md, lg, xl;
+
+@for $k from 1 through 4 {
+
+  @media (min-width: nth($sizes, $k)){
+      .ui-element, .ui-block {
+        &.ui-#{nth($prefixes, $k)}-flex {
+          display: inline-flex;
+        }
+      }
+      .ui-#{nth($prefixes, $k)}-container{
+        display: inline-flex;
+        flex-wrap: wrap;
+        white-space: normal;
+        &.ui-unwrap{
+          flex-wrap: nowrap;
+        }
+      }
+      .ui-#{nth($prefixes, $k)}-element{
+        display: inline-block;
+        white-space: normal;
+      }
+      .ui-#{nth($prefixes, $k)}-block{
+        display: block;
+        white-space: normal;
+      }
+      .ui-#{nth($prefixes, $k)}-hide{
+        display: none;
+      }
+      .ui-#{nth($prefixes, $k)}-unwrapper{
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .ui-#{nth($prefixes, $k)}-scroll{
+        overflow: auto;
+      }
+      .ui-#{nth($prefixes, $k)}-no-scroll{
+        overflow: hidden;
+      }
+      .ui-#{nth($prefixes, $k)}-scroll-y{
+        overflow: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .ui-#{nth($prefixes, $k)}-no-scroll-y{
+        overflow-y: hidden;
+      }
+      .ui-#{nth($prefixes, $k)}-scroll-x{
+        overflow: hidden;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .ui-#{nth($prefixes, $k)}-no-scroll-y{
+        overflow-x: hidden;
+      }
+      .ui-#{nth($prefixes, $k)}-element, .ui-#{nth($prefixes, $k)}-block {
+        &.ui-#{nth($prefixes, $k)}-flex {
+          display: inline-flex;
+        }
+      }
+      .ui-#{nth($prefixes, $k)}-vertical-center{
+        vertical-align: middle;
+      }
+      .ui-#{nth($prefixes, $k)}-horizontal-center{
+        text-align: center;
+      }
+      .ui-#{nth($prefixes, $k)}-vertical-top{
+        vertical-align: top;
+      }
+      .ui-#{nth($prefixes, $k)}-horizontal-left{
+        text-align: left;
+      }
+      .ui-#{nth($prefixes, $k)}-vertical-bottom{
+        vertical-align: bottom;
+      }
+      .ui-#{nth($prefixes, $k)}-horizontal-right{
+        text-align: right;
+      }
+      .ui-#{nth($prefixes, $k)}-all-center{
+        vertical-align: middle;
+        text-align: center;
+      }
+      .ui-#{nth($prefixes, $k)}-horizontal-justify{
+        text-align: justify;
+      }
+
+      .ui-flex, .ui-container,
+      .ui-#{nth($prefixes, $k)}-flex,
+      .ui-#{nth($prefixes, $k)}-container
+      {
+        &.ui-wrap, &.ui-#{nth($prefixes, $k)}-wrap{
+          flex-wrap: wrap;
+        }
+        &.ui-unwrap, &.ui-#{nth($prefixes, $k)}-unwrap,{
+          flex-wrap: nowrap;
+        }
+        &.ui-#{nth($prefixes, $k)}-row{
+          flex-direction: row;
+        }
+        &.ui-#{nth($prefixes, $k)}-row-reverse{
+          flex-direction: row-reverse;
+        }
+        &.ui-#{nth($prefixes, $k)}-column{
+          flex-direction: column;
+        }
+        &.ui-#{nth($prefixes, $k)}-column-reverse{
+          flex-direction: column-reverse;
+        }
+        &.ui-vertical-center,&.ui-#{nth($prefixes, $k)}-vertical-center{
+          align-items: center;
+        }
+        &.ui-horizontal-center,&.ui-#{nth($prefixes, $k)}-horizontal-center{
+          justify-content: center;
+        }
+        &.ui-vertical-top,&.ui-#{nth($prefixes, $k)}-vertical-top{
+          align-items: flex-start;
+        }
+        &.ui-horizontal-left,&.ui-#{nth($prefixes, $k)}-horizontal-left{
+          justify-content: left;
+        }
+        &.ui-vertical-bottom,&.ui-#{nth($prefixes, $k)}-vertical-bottom{
+          align-items: flex-end;
+        }
+        &.ui-horizontal-right,&.ui-#{nth($prefixes, $k)}-horizontal-right{
+          justify-content: right;
+        }
+        &.ui-all-center,&.ui-#{nth($prefixes, $k)}-all-center{
+          align-items: center;
+          justify-content: center;
+        }
+        &.ui-spaced,&.ui-#{nth($prefixes, $k)}-spaced{
+          justify-content: space-between;
+        }
+      }
+
+
+    .ui-#{nth($prefixes, $k)}-relative{
+      position: relative;
+    }
+    .ui-#{nth($prefixes, $k)}-absolute{
+      position: absolute;
+    }
+    .ui-#{nth($prefixes, $k)}-fixed{
+      position: fixed;
+    }
+    .ui-relative, .ui-absolute, .ui-fixed,
+    .ui-#{nth($prefixes, $k)}-relative, .ui-#{nth($prefixes, $k)}-absolute, .ui-#{nth($prefixes, $k)}-fixed
+    {
+      &.ui-left-close,&.ui-#{nth($prefixes, $k)}-left-close{
+        left: 0;
+      }
+      &.ui-right-close,&.ui-#{nth($prefixes, $k)}-right-close{
+        right: 0;
+      }
+      &.ui-bottom-close,&.ui-#{nth($prefixes, $k)}-bottom-close{
+        bottom: 0;
+      }
+      &.ui-top-close,&.ui-#{nth($prefixes, $k)}-top-close{
+        top: 0;
+      }
+      &.ui-vertical-close,&.ui-#{nth($prefixes, $k)}-vertical-close{
+        top: 0;
+        bottom: 0;
+      }
+      &.ui-horizontal-close,&.ui-#{nth($prefixes, $k)}-horizontal-close{
+        left: 0;
+        right: 0;
+      }
+      &.ui-all-close,&.ui-#{nth($prefixes, $k)}-all-close{
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+    }
+
+    //Width
+    .ui-#{nth($prefixes, $k)}-size-fluid{
+      width: 100%;
+    }
+    .ui-#{nth($prefixes, $k)}-fluid-vwidth{
+      width: 100vw;
+    }
+    .ui-#{nth($prefixes, $k)}-fluid{
+      width: 100%;
+      height: 100%;
+    }
+    .ui-#{nth($prefixes, $k)}-vfluid{
+      width: 100vw;
+      height: 100vh;
+    }
+    @for  $i from 1 through 12 {
+        .ui-#{nth($prefixes, $k)}-size-#{$i}{width: #{100% * $i/ 12};}
+      }
+
+   //Height
+    .ui-#{nth($prefixes, $k)}-fluid-height{
+      height: 100%;
+    }
+    .ui-#{nth($prefixes, $k)}-fluid-vheight{
+      height: 100%;
+    }
+    @for $i from 1 through 12 {
+      .ui-#{nth($prefixes, $k)}-height-#{$i}{
+        height: #{100% * $i / 12};
+      }
+      .ui-#{nth($prefixes, $k)}-vheight-#{$i}{
+        height: #{100vh * $i / 12};;
+      }
+    }
+  }
+
+}

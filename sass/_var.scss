@@ -1,0 +1,14 @@
+:root{
+  --theme: rgb(255, 255, 255);
+  --theme-2: rgb(255, 255, 255);
+  --theme-color: black;
+  --theme-global: var(--theme);
+  --font-family0: Poppins;
+  --font-family1: Poppins-Bold;
+  --header-height: 60px;
+}
+
+$theme : var(--theme);
+$theme-color: var(--theme-color);
+$header-height: var(--header-height);
+$fonts : (var(--font-family0), var(--font-family1));

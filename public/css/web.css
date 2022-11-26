@@ -1,0 +1,533 @@
+/* line 1, ../../sass/_var.scss */
+:root {
+  --theme: white;
+  --theme-2: white;
+  --theme-color: black;
+  --theme-global: var(--theme);
+  --font-family0: Poppins;
+  --font-family1: Poppins-Bold;
+  --header-height: 60px;
+}
+
+/* line 5, ../../sass/web.scss */
+body {
+  overflow-x: hidden;
+}
+
+/* line 8, ../../sass/web.scss */
+.header {
+  font-family: var(--font-family1);
+  height: var(--header-height);
+  background-color: var(--theme);
+  color: var(--theme-color);
+  position: sticky;
+  box-shadow: 0 0 0.4em 0 var(--theme-color);
+  top: 0;
+  z-index: 3;
+}
+/* line 17, ../../sass/web.scss */
+.header .icon-zone {
+  padding: 0 .3em;
+}
+/* line 20, ../../sass/web.scss */
+.header icon {
+  font-size: 1.8em;
+  cursor: pointer;
+  width: 43px;
+  height: 43px;
+  line-height: 43px;
+  text-align: center;
+  border-radius: 50%;
+}
+/* line 28, ../../sass/web.scss */
+.header icon:hover {
+  background-color: #eee;
+}
+/* line 32, ../../sass/web.scss */
+.header .nav-title {
+  font-family: Poppins-Bold;
+  padding: 0 .3em;
+  font-size: 1.4em;
+}
+/* line 37, ../../sass/web.scss */
+.header .navbar-logo {
+  background-image: url(../assets/white-logo.jpg);
+  height: 43px;
+  width: 43px;
+  background-size: contain;
+}
+/* line 43, ../../sass/web.scss */
+.header li {
+  --font-family-li: Lexend-Medium;
+  --font-family-li-active: Lexend-Bold;
+  --theme: var(--theme-color);
+  font-size: 1em;
+  position: relative;
+}
+/* line 49, ../../sass/web.scss */
+.header li.active {
+  position: relative;
+}
+/* line 51, ../../sass/web.scss */
+.header li.active:after {
+  content: " ";
+  position: absolute;
+  display: block;
+  width: 20%;
+  height: 3px;
+  border-radius: .4em;
+  background-color: var(--theme-color);
+}
+
+/* line 65, ../../sass/web.scss */
+view {
+  padding: 0 .8em;
+}
+
+/* line 68, ../../sass/web.scss */
+button {
+  border-radius: .2em;
+  min-height: 50px;
+  box-shadow: unset !important;
+}
+/* line 72, ../../sass/web.scss */
+button.primary-theme {
+  background-color: var(--theme-color);
+  color: var(--theme);
+  padding: .4em;
+  border: 1px solid var(--theme-color);
+}
+/* line 77, ../../sass/web.scss */
+button.primary-theme:hover {
+  background-color: #12172d !important;
+  border: 1px solid #12172d;
+  cursor: pointer;
+}
+
+/* line 84, ../../sass/web.scss */
+.caroussel {
+  height: 70vh;
+}
+/* line 88, ../../sass/web.scss */
+.caroussel .slide .ui-image {
+  filter: drop-shadow(0 0 12px var(--theme-color));
+}
+/* line 92, ../../sass/web.scss */
+.caroussel .slide.skeleton h1 {
+  content: " ";
+  background-color: #eeee;
+  width: 30%;
+}
+/* line 97, ../../sass/web.scss */
+.caroussel .slide.skeleton p {
+  content: "";
+  background-color: #eee;
+  width: 100%;
+  height: 4em;
+  margin: .3em 0;
+}
+/* line 104, ../../sass/web.scss */
+.caroussel .slide.skeleton button {
+  content: " Bien ";
+  background-color: #eee !important;
+  color: #eee;
+}
+
+/* line 115, ../../sass/web.scss */
+.article-thumb-space {
+  background-color: rgba(250, 250, 250, 0.95);
+}
+/* line 117, ../../sass/web.scss */
+.article-thumb-space .article-container {
+  background-color: var(--theme);
+}
+
+/* line 121, ../../sass/web.scss */
+.puncline-container {
+  padding: 0 .4em;
+}
+/* line 123, ../../sass/web.scss */
+.puncline-container h1 {
+  padding: .4em 0;
+  background-color: white;
+}
+/* line 127, ../../sass/web.scss */
+.puncline-container .punchline {
+  background-size: contain;
+  height: 300px;
+  background-color: white;
+  margin-bottom: .4em;
+}
+
+/* line 134, ../../sass/web.scss */
+.trending {
+  padding: .3em;
+}
+/* line 136, ../../sass/web.scss */
+.trending .article-thumb {
+  height: 40vmin;
+  padding: .4em;
+}
+/* line 139, ../../sass/web.scss */
+.trending .article-thumb .image {
+  border-radius: .8em;
+}
+/* line 142, ../../sass/web.scss */
+.trending .article-thumb .metadata {
+  padding: .3em;
+}
+/* line 144, ../../sass/web.scss */
+.trending .article-thumb .metadata .title {
+  padding: .3em 0;
+  font-family: Merriweather-Black;
+  font-size: 1.2em;
+}
+/* line 149, ../../sass/web.scss */
+.trending .article-thumb .metadata .subtitle {
+  font-family: Merriweather-Light;
+  font-size: .8em;
+  line-height: 1.3em;
+  overflow: hidden;
+}
+/* line 155, ../../sass/web.scss */
+.trending .article-thumb .metadata .date {
+  padding: .4em;
+  font-family: Roboto-Light;
+}
+/* line 160, ../../sass/web.scss */
+.trending .article-thumb.skeleton {
+  background-color: #fff;
+}
+/* line 162, ../../sass/web.scss */
+.trending .article-thumb.skeleton .image {
+  background-color: #eee;
+}
+/* line 166, ../../sass/web.scss */
+.trending .article-thumb.skeleton .metadata .title {
+  background-color: #eee;
+  height: 1em;
+  width: 50%;
+}
+/* line 171, ../../sass/web.scss */
+.trending .article-thumb.skeleton .metadata .subtitle {
+  background-color: #eee;
+  height: 10em;
+  margin: .2em 0;
+}
+/* line 176, ../../sass/web.scss */
+.trending .article-thumb.skeleton .metadata .date {
+  height: .5em;
+  background-color: #eee;
+  width: 10%;
+}
+
+/* line 185, ../../sass/web.scss */
+.bottom-gradient {
+  --background: #ffffff;
+  background-color: #ffffff;
+  background-image: linear-gradient(#ffffff, #12172d 90%);
+}
+/* line 192, ../../sass/web.scss */
+.bottom-gradient .about-us .logo {
+  background-image: url(../assets/black-logo.png);
+  height: 200%;
+  left: 0;
+}
+/* line 198, ../../sass/web.scss */
+.bottom-gradient .about-us .symbol {
+  padding: .4em;
+  left: 0;
+}
+/* line 202, ../../sass/web.scss */
+.bottom-gradient .about-us .symbol .image {
+  background-size: contain;
+}
+/* line 212, ../../sass/web.scss */
+.bottom-gradient .about-us .ads {
+  padding: .2em;
+}
+/* line 215, ../../sass/web.scss */
+.bottom-gradient .about-us .ads h1 {
+  padding: .3em;
+}
+/* line 219, ../../sass/web.scss */
+.bottom-gradient .about-us .ads p {
+  padding: .4em 1em;
+  font-family: OpenSans-Light;
+  line-height: 1.2em;
+  text-align: justify;
+}
+/* line 226, ../../sass/web.scss */
+.bottom-gradient .about-us .ads .ui-action {
+  padding: .6em .8em;
+}
+/* line 229, ../../sass/web.scss */
+.bottom-gradient .about-us .ads .ui-action button {
+  padding: .8em;
+  box-shadow: unset;
+  background-color: var(--theme-color);
+  color: var(--theme);
+}
+/* line 238, ../../sass/web.scss */
+.bottom-gradient .newsletter {
+  padding: .5em 1em;
+}
+/* line 240, ../../sass/web.scss */
+.bottom-gradient .newsletter h2 {
+  font-family: Merriweather-Bold;
+  font-size: 1.6em;
+  color: white;
+  padding: .8em 0;
+}
+/* line 246, ../../sass/web.scss */
+.bottom-gradient .newsletter .field {
+  background-color: #fff;
+  overflow: hidden;
+  border-radius: .2em;
+  height: 50px;
+}
+/* line 251, ../../sass/web.scss */
+.bottom-gradient .newsletter .field input, .bottom-gradient .newsletter .field button {
+  height: inherit;
+  border: 0;
+  padding: 0 .4em;
+  outline: none;
+  border-radius: 0;
+}
+/* line 258, ../../sass/web.scss */
+.bottom-gradient .newsletter .field button {
+  background-color: var(--theme-color);
+  color: var(--theme);
+  font-size: 1.6em;
+}
+/* line 265, ../../sass/web.scss */
+.bottom-gradient footer {
+  padding-top: 3em;
+  background-image: linear-gradient(rgba(0, 0, 0, 0), #12172d);
+}
+
+/* line 271, ../../sass/web.scss */
+menu {
+  z-index: 6;
+  transform: translate3d(-100%, 0, 0);
+  transition-duration: .3s;
+  transition-property: transform;
+}
+/* line 277, ../../sass/web.scss */
+menu.open {
+  transform: translate3d(0, 0, 0);
+}
+/* line 280, ../../sass/web.scss */
+menu .drawer-img {
+  background-image: url(../assets/rapper-hip.png);
+  background-color: #fff;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: bottom center;
+  filter: sepia(5%);
+}
+/* line 288, ../../sass/web.scss */
+menu .drawer {
+  box-shadow: 0 0 2px 0 #444;
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) -40%, #ffffff 90%);
+}
+/* line 293, ../../sass/web.scss */
+menu .drawer .panel icon {
+  font-size: 2em;
+  padding: .4em;
+  background-color: rgba(240, 240, 240, 0.2);
+  border-radius: .4em;
+  margin: .2em;
+}
+/* line 300, ../../sass/web.scss */
+menu .drawer .panel .name {
+  font-family: Poppins-Bold;
+  font-size: 1.4em;
+  padding: 0 .5em;
+}
+/* line 306, ../../sass/web.scss */
+menu .drawer li {
+  padding: .8em 2em;
+  font-size: 1.3em;
+}
+/* line 309, ../../sass/web.scss */
+menu .drawer li a {
+  color: #333;
+  text-decoration: none;
+  font-family: Poppins-Light;
+}
+/* line 314, ../../sass/web.scss */
+menu .drawer li.active a {
+  font-family: Poppins-Bold;
+}
+
+/* line 320, ../../sass/web.scss */
+.search-panel {
+  background-color: #fff;
+  z-index: 4;
+  box-shadow: -2px 0 4px 0 #777;
+  transition-duration: .3s;
+  transition-property: transform;
+  -moz-transform: translate3d(105%, 0, 0);
+  -ms-transform: translate3d(105%, 0, 0);
+  -webkit-transform: translate3d(105%, 0, 0);
+  transform: translate3d(105%, 0, 0);
+}
+/* line 327, ../../sass/web.scss */
+.search-panel.open {
+  -moz-transform: translate3d(0%, 0, 0);
+  -ms-transform: translate3d(0%, 0, 0);
+  -webkit-transform: translate3d(0%, 0, 0);
+  transform: translate3d(0%, 0, 0);
+}
+/* line 330, ../../sass/web.scss */
+.search-panel .head {
+  height: 60px;
+  background-color: #eee;
+}
+/* line 333, ../../sass/web.scss */
+.search-panel .head icon {
+  padding: .2em;
+  border-radius: .4em;
+  margin-right: .3em;
+  font-size: 2em;
+}
+/* line 340, ../../sass/web.scss */
+.search-panel .head .field {
+  padding: .4em;
+  border-radius: .4em;
+  font-family: OpenSans;
+  background-color: unset;
+}
+
+/* line 348, ../../sass/web.scss */
+footer {
+  padding: .4em;
+  color: var(--theme);
+  background-color: #12172d;
+}
+/* line 352, ../../sass/web.scss */
+footer.home {
+  background-color: unset;
+}
+/* line 355, ../../sass/web.scss */
+footer .links-box {
+  padding: .3em;
+}
+/* line 357, ../../sass/web.scss */
+footer .links-box li {
+  padding: .2em 0;
+}
+/* line 360, ../../sass/web.scss */
+footer .links-box a {
+  color: white;
+  font-family: OpenSans-Light;
+  text-decoration: none;
+}
+/* line 366, ../../sass/web.scss */
+footer .social-box {
+  padding: .5em;
+  gap: .8em;
+}
+/* line 369, ../../sass/web.scss */
+footer .social-box a {
+  width: 43px;
+  height: 43px;
+  background-color: #eee;
+  border-radius: 50%;
+  text-decoration: none;
+  font-size: 1.3em;
+  color: #090b13;
+}
+/* line 379, ../../sass/web.scss */
+footer .copyright {
+  font-family: Poppins-Light;
+  font-size: .9em;
+  padding: .6em 0;
+}
+/* line 384, ../../sass/web.scss */
+footer .end {
+  padding-top: .8em;
+}
+
+/* line 390, ../../sass/web.scss */
+.type-chooser {
+  padding: .8em;
+}
+/* line 392, ../../sass/web.scss */
+.type-chooser label {
+  font-family: Lexend-Medium;
+  font-size: 1em;
+  padding: .4em;
+}
+/* line 397, ../../sass/web.scss */
+.type-chooser button {
+  min-height: 40px;
+  margin: 0 .2em;
+}
+
+/* line 402, ../../sass/web.scss */
+.article-preview {
+  padding: .4em;
+  margin: .3em 0;
+  text-decoration: none;
+  color: inherit;
+}
+/* line 407, ../../sass/web.scss */
+.article-preview h1 {
+  padding: .3em 0;
+}
+/* line 410, ../../sass/web.scss */
+.article-preview .caption {
+  height: 50vh;
+  background-position: top center;
+  border-radius: .4em;
+}
+/* line 415, ../../sass/web.scss */
+.article-preview .date {
+  padding: .2em;
+}
+/* line 418, ../../sass/web.scss */
+.article-preview .text {
+  padding: .4em .1em;
+}
+/* line 423, ../../sass/web.scss */
+.article-preview.skeleton * {
+  background-color: #eee;
+  margin: .1em 0;
+}
+/* line 427, ../../sass/web.scss */
+.article-preview.skeleton h1 {
+  width: 60%;
+  height: 2em;
+}
+/* line 431, ../../sass/web.scss */
+.article-preview.skeleton .date {
+  height: .8em;
+  width: 10%;
+}
+/* line 435, ../../sass/web.scss */
+.article-preview.skeleton .text {
+  height: 3em;
+}
+/* line 439, ../../sass/web.scss */
+.article-preview:hover {
+  background-color: #fff;
+}
+
+@media (min-width: 768px) {
+  /* line 446, ../../sass/web.scss */
+  .trending .article-thumb .metadata .title {
+    padding: .3em 0;
+    font-size: 1.6em;
+  }
+  /* line 450, ../../sass/web.scss */
+  .trending .article-thumb .metadata .subtitle {
+    font-size: 1em;
+    line-height: 1.8em;
+  }
+  /* line 454, ../../sass/web.scss */
+  .trending .article-thumb .metadata .date {
+    padding: .4em;
+  }
+}
