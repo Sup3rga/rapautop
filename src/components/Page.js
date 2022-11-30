@@ -8,6 +8,9 @@ import Events from "../utils/Events";
 export default class Page extends React.Component{
     constructor(props) {
         super(props);
+        let {title} = this.props;
+        title = title || '';
+        document.title = title;
     }
 
     componentDidMount() {
@@ -25,7 +28,7 @@ export default class Page extends React.Component{
             <>
                 {this.props.menu}
                 {this.props.search}
-                <main className="ui-container ui-size-fluid"
+                <main className={"ui-container ui-size-fluid " + (this.props.className ? this.props.className : '')}
                       onClick={()=>{
                         Events.emit("close-search");
                       }}
@@ -43,6 +46,8 @@ export class DefaultPage extends React.Component{
     render() {
         return (
             <Page
+                className={this.props.className}
+                title={this.props.title || Ressources.getProjectName()}
                 header={<Header title={Ressources.getProjectName()}
                                 links={Ressources.links}/>}
                 menu={<Drawer/>}

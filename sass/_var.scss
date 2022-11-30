@@ -1,6 +1,6 @@
 :root{
-  --theme: rgb(255, 255, 255);
-  --theme-2: rgb(255, 255, 255);
+  --theme: #{rgb(255, 255, 255)};
+  --theme-2: #{rgb(255, 255, 255)};
   --theme-color: black;
   --theme-global: var(--theme);
   --font-family0: Poppins;

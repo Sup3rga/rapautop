@@ -18,7 +18,8 @@ export class Li extends React.Component{
 
     render() {
         let {href,children} = this.props,
-            active = Url.get() === href,
+            url = Url.get(),
+            active = (url.indexOf(href) === 0 && href != '/') || href == url,
             cls = "ui-element ui-relative nav-item " +(active ? 'active' : '');
         return (
             <li className={this.props.className+" "+cls}>
@@ -27,19 +28,6 @@ export class Li extends React.Component{
                 </Link>
             </li>
         );
-    }
-}
-
-class HeaderNav extends React.Component{
-
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        return Object.keys(this.props.data).map((key, index)=>{
-                    return <Li className="ui-nowrap" href={key} key={index}>{this.props.data[key]}</Li>
-                })
     }
 }
 
@@ -68,7 +56,8 @@ export default class Header extends React.Component{
     constructor(props) {
         super(props);
         this.state = {
-            showFilter: false
+            showFilter: false,
+            shadow: false
         };
     }
 
@@ -91,18 +80,32 @@ export default class Header extends React.Component{
                     }
                 });
             }
-        });
+        }).on('scroll', e => {
+            this.setState((state)=>{
+                return {
+                    ...state,
+                    shadow: e.top > 60
+                }
+            });
+        })
     }
 
     render(){
-        return <header className="ui-container ui-size-fluid header ui-header ui-flex ui-vertical-center">
+        return <header className={
+            "ui-container ui-size-fluid header ui-header ui-flex ui-vertical-center "+
+            (this.state.shadow ? 'shadow' : '')
+        }>
             <div className="ui-container ui-size-8 ui-md-size-4">
                 <Banner title={this.props.title}/>
             </div>
             <div className="ui-md-container ui-hide ui-size-6 ui-nav ui-unwrap">
-                <HeaderNav data={this.props.links}/>
+                {
+                    Object.keys(this.props.links).map((key, index)=>{
+                        return <Li className="ui-nowrap" href={key} key={index}>{this.props.links[key]}</Li>
+                    })
+                }
             </div>
-            <div className="ui-md-container ui-size-4 ui-md-size-2 ui-horizontal-right icon-zone">
+            <div className="ui-md-container ui-unwrap ui-size-4 ui-md-size-2 ui-horizontal-right icon-zone">
                 {
                     this.state.showFilter ?
                     <Icon mode="ion" icon="android-options" onClick={e => {

@@ -1,4 +1,5 @@
 import AkaDatetime from './AkaDatetime';
+import test from '../article';
 
 export default class Ressources{
     static links = {
@@ -8,8 +9,15 @@ export default class Ressources{
         "/contact-us": "Contactez-nous"
     };
 
+    static calendar = {
+      months: ['Jan','Fev','Mars','Avr', 'Mai','Juin', 'Juil','Août', 'Sept', 'Oct','Nov','Déc'],
+      days: ['Dimanche','Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
+    };
+
     static getDateString(val){
-        return new AkaDatetime(val).getDateTime();
+        var date = new AkaDatetime(val),
+            calendar = Ressources.calendar;
+        return calendar.days[date.getWeekDay()]+' '+date.getDay()+' '+calendar.months[date.getMonth() * 1 - 1]+' '+date.getFullYear();
     }
 
     static getUrl(){
@@ -102,30 +110,35 @@ export default class Ressources{
     static async getArticles(){
         return [
             {
+                id: 12,
                 title: "50 Cent sur le podium...",
                 subtitle: "La nuit dernière était épique. Mais à savoir comment, il faut lire la suite pour savoir.",
                 caption: './assets/captions/rapcap004.jpg',
                 categorie: "musique",
                 date: '2022-11-13'
             },{
+                id: 15,
                 title: "La victoire de je ne sais qui !",
                 subtitle: "Découvrez ce qui s'est passé lors de la cérémonie de BET",
                 caption: './assets/captions/rapcap006.jpg',
                 categorie: "actualites",
                 date: '2022-11-06'
             },{
+                id: 19,
                 title: "La victoire de je ne sais qui !",
                 subtitle: "Découvrez ce qui s'est passé lors de la cérémonie de BET",
                 caption: './assets/captions/rapcap007.jpg',
                 categorie: "actualites",
                 date: '2022-11-06'
             },{
+                id: 21,
                 title: "La victoire de je ne sais qui !",
                 subtitle: "Découvrez ce qui s'est passé lors de la cérémonie de BET",
                 caption: './assets/captions/rapcap008.jpg',
                 categorie: "hip-hop",
                 date: '2022-11-06'
             },{
+                id: 17,
                 title: "Jay-z est de retour pour...",
                 subtitle: "Par manque d'inspiration pour écrire des concepts d'articles, nous voilà quelque part " +
                     "sur Jay-z pour dire un truc, quoi !  ",
@@ -196,6 +209,66 @@ export default class Ressources{
             }
         ];
     }
+
+    static async getPunchlinesData(filter){
+        return [
+            {
+                image: './assets/captions/rappunch001.jpg',
+                artist: 'Dinos',
+                category: 'Hip-Hop',
+                year: 2020,
+                music: 'Titre de la musique',
+                comment: "Ceci est un commentaire sur le punchline",
+                text: 'Ceci est le texte'
+            },
+            {
+                image: './assets/captions/rappunch002.jpg',
+                artist: 'Dinos',
+                category: 'Hip-Hop',
+                year: 2020,
+                music: 'Titre de la musique',
+                comment: "Ceci est un commentaire sur le punchline",
+                text: 'Ceci est le texte'
+            },
+            {
+                image: './assets/captions/rappunch003.jpg',
+                artist: 'Dinos',
+                category: 'Hip-Hop',
+                year: 2020,
+                music: 'Titre de la musique',
+                comment: "Ceci est un commentaire sur le punchline",
+                text: 'Ceci est le texte'
+            },
+            {
+                image: './assets/captions/rappunch002.jpg',
+                artist: 'Dinos',
+                category: 'Hip-Hop',
+                year: 2020,
+                music: 'Titre de la musique',
+                comment: "Ceci est un commentaire sur le punchline",
+                text: 'Ceci est le texte'
+            },
+            {
+                image: './assets/captions/rappunch003.jpg',
+                artist: 'Dinos',
+                category: 'Hip-Hop',
+                year: 2020,
+                music: 'Titre de la musique',
+                comment: "Ceci est un commentaire sur le punchline",
+                text: 'Ceci est le texte'
+            },
+            {
+                image: './assets/captions/rappunch002.jpg',
+                artist: 'Dinos',
+                category: 'Hip-Hop',
+                year: 2020,
+                music: 'Titre de la musique',
+                comment: "Ceci est un commentaire sur le punchline",
+                text: 'Ceci est le texte'
+            }
+        ];
+    }
+
     static getLastPunchLinesDataFakeData(){
         let qty = Math.ceil(Math.random() * 5 + 1),
             r = [];
@@ -205,5 +278,27 @@ export default class Ressources{
             });
         }
         return r;
+    }
+
+    static range(min= 0,max = 1){
+        let t = [];
+        min *= 1;
+        max *= 1;
+        for(let i = min; i <= max; i++){
+            t.push(i);
+        }
+        return t;
+    }
+
+    static async getArticleData(){
+        return {
+            title: "La sortie d'une nouvelle single de Hip-Hop prochainement dans les bac",
+            text: test,
+            caption: '/assets/captions/rapcap008.jpg',
+            publishDate: '11-08-2022',
+            time: '13:00',
+            stats: [],
+            author: null
+        };
     }
 }

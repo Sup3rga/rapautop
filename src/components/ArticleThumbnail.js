@@ -29,9 +29,10 @@ export default class ArticleThumbnail extends React.Component{
 
 export class ArticlePreview extends React.Component{
     render() {
-        let {title, caption, text, date, className, skeleton} = this.props;
+        let {title, caption, text, date, className, skeleton,id} = this.props,
+            linkTitle = (title+"").replace(/ +/g, '+');
         return (
-            <Link href="/read" className={
+            <Link href={skeleton ? '' : '/articles/'+id+'/'+linkTitle} className={
                 "ui-container ui-size-fluid article-preview "+
                 className + " " +
                 (skeleton ? 'skeleton' : '')
@@ -43,7 +44,7 @@ export class ArticlePreview extends React.Component{
                 <div className="ui-element ui-size-fluid ui-image caption ui-image-first" style={{
                     backgroundImage: 'url('+caption+')'
                 }}/>
-                <div className="ui-element ui-size-fluid date">
+                <div className="ui-element date">
                     {skeleton ? '' : Ressources.getDateString(date)}
                 </div>
             </Link>

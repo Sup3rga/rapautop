@@ -7,7 +7,6 @@ var AkaDatetime = function(dateString){
     AkaDatetime.EQUALS = 1;
     AkaDatetime.LESS_THAN = 0;
     AkaDatetime.MORE_THAN = 2;
-    console.log('[Date]',dateString);
 
     function setWeekDay(){
         var weekSum = 7 * 24 * 60 * 60,
@@ -389,7 +388,6 @@ var AkaDatetime = function(dateString){
         var date = new AkaDatetime('00:00:00');
         return date.add(date1).sub(date2);
     }
-
 
     extract(this.stringify(dateString));
 }

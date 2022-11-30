@@ -33,11 +33,13 @@ export default class FilterBox extends OverLayer{
     }
 
     static content(categories, def){
+        this.filter = def || this.filter;
+        console.log('[Def]',def);
         return (
             <>
                 <label>Catégories</label>
                 <Field type="select"
-                       className="ui-size-3 field"
+                       className="ui-size-6 ui-md-size-3 field"
                        placeholder="Cat" options={categories}
                        value={this.filter}
                        onChange={e=>{
@@ -62,7 +64,7 @@ export default class FilterBox extends OverLayer{
                     Events.emit("close-filter-box");
                 }}/>
                 <div className="ui-container ui-box ui-size-8 ui-md-size-4 ui-lg-size-3">
-                    {FilterBox.content(this.props.categories, this.props.default)}
+                    {FilterBox.content(this.props.categories, this.state.filter)}
                 </div>
             </div>
         );

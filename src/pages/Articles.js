@@ -16,7 +16,8 @@ export default class Articles extends React.Component{
         this.state = {
             categories: {},
             articles: Ressources.getArticlesFakeData(),
-            currentCategorie: "all"
+            currentCategorie: "all",
+            seemore: false,
         };
     }
 
@@ -54,7 +55,7 @@ export default class Articles extends React.Component{
                    }
                 });
             });
-        },1000);
+        },2000);
     }
 
     render(){
@@ -63,7 +64,7 @@ export default class Articles extends React.Component{
                 <FilterBox className="filter-box" default={this.state.currentCategorie} categories={this.state.categories}/>
                 <DefaultPage>
                     <div className="ui-container ui-size-fluid type-chooser ui-vertical-center">
-                        {FilterBox.content(this.state.categories)}
+                        {FilterBox.content(this.state.categories, this.state.currentCategorie)}
                     </div>
                     <div className="ui-container ui-size-fluid">
 
@@ -72,12 +73,16 @@ export default class Articles extends React.Component{
                         <div className="ui-container ui-size-fluid ui-sm-size-10 ui-md-size-8 ui-lg-size-6  articles-container ui-horizontal-left">
                             {
                                 this.state.articles.map((article,index)=>{
+                                    if(article.title !== null){
+                                        this.state.seemore = true;
+                                    }
                                     if([article.categorie, 'all'].indexOf(this.state.currentCategorie) < 0 && article.title !== null){
                                         return;
                                     }
                                     return (
                                         <ArticlePreview
                                             key={index}
+                                            id={article.id}
                                             skeleton={article.title === null}
                                             title={article.title}
                                             text={article.subtitle}
@@ -88,6 +93,13 @@ export default class Articles extends React.Component{
                                 })
                             }
                         </div>
+                        {
+                            this.state.seemore ?
+                            <div className="ui-container ui-all-center ui-size-fluid">
+                                <button className="ui-element ui-button light" id="see-more-article">Voir plus <Icon icon="arrow-down"/></button>
+                            </div>:
+                            null
+                        }
                     </div>
                     <Footer />
                 </DefaultPage>

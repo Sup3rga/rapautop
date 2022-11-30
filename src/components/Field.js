@@ -3,11 +3,11 @@ import React from 'react';
 export default class Field extends React.Component{
 
     render() {
-        let {placeholder,type,options,children, onChange} = this.props;
+        let {placeholder,type,options,children, onChange, value} = this.props;
         type = type || 'text';
         options = options || {}
         let field = null;
-        console.log('[children]',type,children);
+        // console.log('[children]',type,children);
         switch (type){
             case 'select':
                 field = (
@@ -17,8 +17,11 @@ export default class Field extends React.Component{
                         onChange={onChange}
                     >
                         {children ? children :
-                            Object.keys(options).map((value,index)=>{
-                                return <option value={value}>{options[value]}</option>
+                            Object.keys(options).map((val,index)=>{
+                                if(value == val){
+                                    return <option value={val} selected>{options[val]}</option>;
+                                }
+                                return <option value={val}>{options[val]}</option>
                             })
                         }
                     </select>

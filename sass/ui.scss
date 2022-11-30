@@ -2,10 +2,10 @@
     root
  */
 :root{
-  --theme: #ffffff;
-  --theme-2: #000;
-  --theme-global: #fffdf4;
-  --color: rgb(0, 0, 0);
+  --theme: #{#ffffff};
+  --theme-2: #{#000};
+  --theme-global: #{#fffdf4};
+  --color: #{rgb(0, 0, 0)};
   --caroussel-background: #eee;
   --footer-background: #393128;
   --font-family: Roboto;
@@ -280,6 +280,16 @@ h1{
   font-family: var(--font-family-paragraph);
   padding: 2em;
 }
+.ui-text-ellipsis{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ui-text-clipped{
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: clip;
+}
 .ui-button{
   padding: var(--ui-button-padding);
   font-family: var(--font-family-button);
@@ -292,6 +302,14 @@ h1{
     background-color: var(--theme);
     color: var(--theme-2);
     box-shadow: 0 2px 3px 0 var(--theme-2);
+  }
+  &.ui-success-theme{
+    background-color: green;
+    color: white;
+  }
+  &.ui-alert-theme{
+    background-color: #871010;
+    color: white;
   }
   &:focus{
     box-shadow: 0 2px 3px 0 #ccc;

@@ -12,20 +12,21 @@ export default class Route extends React.Component{
 
     getView(){
         let routes = Route._routes,
-            url = Url.get();
-        console.log('[URL]',url,routes);
-        if(url in routes){
-            return routes[url];
+            url = Url.get(),
+            view = (
+                <div>
+                    Empty !
+                </div>
+            );
+        for(var i in routes){
+            if(new RegExp('^'+i.replace(/\//g,'\\/')+'$').test(url)){
+                view = routes[i];
+            }
         }
-        else{
-            return <div>
-                Empty !
-            </div>
-        }
+        return view;
     }
 
     setView(){
-        console.log('[mounted]', Drawer.active)
         if(!Drawer.active){
             this.setState(this.getView());
             return;

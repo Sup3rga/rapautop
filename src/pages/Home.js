@@ -8,6 +8,7 @@ import ArticleThumbnail from "../components/ArticleThumbnail";
 import Footer from "../components/Footer";
 import Drawer from "../components/Menu";
 import SearchPanel from "../components/SearchPanel";
+import {Punchline} from "./Punchlines";
 
 export default class Home extends React.Component{
     
@@ -88,16 +89,7 @@ export default class Home extends React.Component{
                             <h1 className="ui-element ui-size-fluid ui-horizontal-center">Les dernières punchlines</h1>
                             {
                                 this.state.punchlines.map((img,index)=>{
-                                    return <div
-                                        key={index}
-                                        className={
-                                            "ui-element ui-size-fluid ui-image punchline "+
-                                            (img.image === null ? 'skeleton' : '')
-                                        }
-                                        style={{
-                                            backgroundImage: 'url('+img.image+')'
-                                        }}
-                                    />
+                                    return <Punchline className="ui-size-fluid" data={img} key={index}/>
                                 })
                             }
                         </div>
