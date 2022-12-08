@@ -1,13 +1,20 @@
 import React from 'react';
+import {Icon} from "./Header";
 
 export default class Field extends React.Component{
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            passwordVisible: false
+        }
+    }
+
     render() {
-        let {placeholder,type,options,children, onChange, value} = this.props;
+        let {placeholder,type,options,children, onChange, value, toggled} = this.props;
         type = type || 'text';
         options = options || {}
         let field = null;
-        // console.log('[children]',type,children);
         switch (type){
             case 'select':
                 field = (
@@ -40,16 +47,40 @@ export default class Field extends React.Component{
             break;
             default:
                 field = (
-                    <input className="ui-element ui-size-fluid"
-                           placeholder={placeholder || ''}
-                           type={type || 'text'}
-                           onChange={onChange}
-                    />
+                    <>
+                        <input className="ui-element ui-size-fluid"
+                               placeholder={placeholder || ''}
+                               type={toggled && this.state.passwordVisible ? 'text' : type || 'text'}
+                               onChange={onChange}
+                        />
+                        {
+                            type.toLowerCase() == 'password' && toggled ?
+                            <Icon mode="ion"
+                                  className="ui-element"
+                                  icon={this.state.passwordVisible ? 'eye-disabled' : 'eye'}
+                                  style={{
+                                      padding: ".4em 1em",
+                                      color: "rgba(0,0,0,.7)"
+                                  }}
+                                  onClick={(e)=>{
+                                      this.setState({
+                                          passwordVisible: !this.state.passwordVisible
+                                      })
+                                  }}
+                            />
+                                :
+                            null
+                        }
+                    </>
                 );
         }
         return (
             <div className={
-                "ui-container ui-field " + this.props.className
+                "ui-container ui-field " + this.props.className + " " +
+                (
+                    type.toLowerCase() == 'password' && toggled ?
+                    "ui-unwrap ui-flex ui-vertical-center" : ""
+                )
             }>
                 {field}
             </div>

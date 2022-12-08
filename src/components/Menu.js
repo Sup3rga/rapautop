@@ -1,7 +1,6 @@
 import React from 'react';
 import {Icon, Li} from "./Header";
 import Ressources from "../utils/Ressources";
-import InterConnection from "../utils/InterConnection";
 import Events from "../utils/Events";
 import OverLayer from "./OverLayer";
 

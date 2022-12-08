@@ -10,7 +10,7 @@ export class Icon extends React.Component{
         const style = 'mode' in this.props ? ['line','ion'].indexOf(this.props.mode.toString().toLowerCase()) >= 0 : 'line',
               prefix = style == 'line' ? 'las la-' : 'ion-',
               cls = prefix+this.props.icon;
-        return <icon className={cls+" "+this.props.className} onClick={this.props.onClick}></icon>;
+        return <icon {...this.props} className={cls+" "+this.props.className} onClick={this.props.onClick}></icon>;
     }
 }
 

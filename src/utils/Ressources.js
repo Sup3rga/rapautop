@@ -14,6 +14,8 @@ export default class Ressources{
       days: ['Dimanche','Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
     };
 
+    static apis = "http://localhost:7070";
+
     static getDateString(val){
         var date = new AkaDatetime(val),
             calendar = Ressources.calendar;

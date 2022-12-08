@@ -1,7 +1,7 @@
 import React from 'react';
 import Url from "./Url";
 import Events from "./Events";
-import Drawer from '../components/Menu'
+import Drawer from '../components/Menu';
 
 export default class Route extends React.Component{
     static _routes = {};
@@ -15,7 +15,7 @@ export default class Route extends React.Component{
             url = Url.get(),
             view = (
                 <div>
-                    Empty !
+                    Empty view .!
                 </div>
             );
         for(var i in routes){

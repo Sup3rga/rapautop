@@ -1,0 +1,55 @@
+@import "compass/css3";
+@import "./_var";
+
+$theme: #12172d;
+$theme-color: white;
+
+#login{
+  @include background-image(url(../assets/background.jpg));
+  .mask{
+    padding: .4em 0;
+    @include background-image(linear-gradient(-45deg, $theme 30%, rgba(18,23,45,0.98)  50%, rgba(255,255,255,0.94) 50%, $theme-color 80%));
+  }
+  .box{
+    background-color: $theme-color;
+    padding: 1em;
+    padding-bottom: 2em;
+    @include box-shadow(0 0 .6em 0 $theme);
+    @include border-radius(.4em);
+    .banner{
+      padding: .8em .4em 0 .4em;
+      h1{
+        padding: 0 .4em;
+      }
+    }
+    h2{
+      padding: .4em 0;
+      margin-bottom: .4em;
+      font-family: Lexend;
+      letter-spacing: .4em;
+    }
+  }
+  .logo{
+    height: 3.5em;
+    background-image: url(../assets/white-logo.jpg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  .wrapper{
+    padding: .5em 0;
+    .field{
+      height: 50px;
+    }
+  }
+  button{
+    margin-top: .4em;
+    background-color: $theme;
+    color: $theme-color;
+  }
+  .footer{
+    padding: .5em 2em .5em .5em;
+    font-family: Poppins, serif;
+    color: $theme-color;
+  }
+}
