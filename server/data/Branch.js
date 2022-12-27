@@ -1,3 +1,6 @@
+let Storage = require('../utils/Connect'),
+    Channel = require('../utils/Channel'),
+    Data = require('./Data');
 
 class Branch extends Data{
     constructor() {

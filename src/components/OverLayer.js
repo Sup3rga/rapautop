@@ -6,6 +6,7 @@ export default class OverLayer extends React.Component{
     constructor(props) {
         super(props);
         this.eventName = [];
+        this.mounted = false;
     }
 
     setEventNames(list){
@@ -14,18 +15,20 @@ export default class OverLayer extends React.Component{
 
     componentDidMount() {
         OverLayer.active = true;
+        this.mounted = true;
         let open = this.open.bind(this)
         Events.on(this.eventName[0], ()=>{
             open(true);
-        })
+        },this)
         Events.on(this.eventName[1], ()=>{
             open(false);
-        })
+        },this)
     }
 
     componentWillUnmount() {
         OverLayer.active = false;
-        Events.off(this.eventName[0]).off(this.eventName[1]);
+        this.mounted = false;
+        // Events.off(this.eventName[0]).off(this.eventName[1]);
     }
 
     open(e){

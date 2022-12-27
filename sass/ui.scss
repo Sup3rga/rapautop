@@ -316,6 +316,7 @@ h1{
   }
   &.light{
     background-color: rgba(200,200,200,.1);
+    box-shadow: unset;
     border: 0;
   }
 }

@@ -3,6 +3,50 @@
 
 $theme: #12172d;
 $theme-color: white;
+$sidemenu-width:  80px;
+$bar-height: 55px;
+$bottom-bar-height: 60px;
+
+.dialog-box{
+  z-index: 4;
+  overflow: hidden;
+  left: 0;
+  right: 0;
+  top: 50%;
+  bottom: 50%;
+  transition-property: top,bottom;
+  transition-duration: .2s;
+  &.open{
+    top: 0;
+    bottom: 0;
+  }
+  .mask{
+    background-color: rgba(0,0,0,.1);
+    @include backdrop-filter(blur(2px));
+  }
+  .box{
+    background-color: #fff;
+    padding: 1em;
+    @include box-shadow(0 2px 4px 0 #777);
+  }
+}
+.avatar{
+  background-color: #eee;
+}
+.float-wrapper{
+  padding: .3em;
+  button{
+    --size: 50px;
+    display: block;
+    border: 0;
+    width: var(--size);
+    height: var(--size);
+    font-size: 1.4em;
+    background-color: $theme;
+    color: $theme-color;
+    border-radius: 50%;
+  }
+}
 
 #login{
   @include background-image(url(../assets/background.jpg));
@@ -51,5 +95,264 @@ $theme-color: white;
     padding: .5em 2em .5em .5em;
     font-family: Poppins, serif;
     color: $theme-color;
+  }
+}
+
+
+#main-panel{
+  background-color: #eee;
+  $sidemenu-width: 0%;
+  .sidemenu{
+    padding: 3em .4em;
+    transition-duration: .3s;
+    transition-property: width;
+    width: $sidemenu-width;
+    .user-zone{
+      height: 70px;
+    }
+    .avatar{
+      background-color: $theme;
+      color: $theme-color;
+      font-family: Poppins;
+      font-size: .9em;
+    }
+    .toggler{
+      font-size: 1.4em;
+      padding: .4em 0;
+    }
+    button icon{
+      color: $theme;
+    }
+    .link{
+      --height: 55px;
+      padding: .4em;
+      height: var(--height);
+      color: $theme;
+      margin: .2em 0;
+      border-radius: 2em;
+      text-decoration: none;
+      icon{
+        width: 40px;
+        border-radius: 40px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        font-size: 1.4em;
+      }
+      .text{
+        display: none;
+        padding: .4em;
+        padding-left: 1em;
+        font-family: Poppins;
+      }
+      &.active{
+        icon{
+          background-color: $theme;
+          color: $theme-color;
+          box-shadow: 0 1px 3px 0 #333;
+        }
+        .text{
+          font-family: Poppins-Bold;
+        }
+      }
+    }
+  }
+  .view-wrapper{
+    width: calc(100% - #{$sidemenu-width});
+    overflow: hidden;
+    transition-duration: .3s;
+    transition-property: width;
+    border-radius: .4em 0 0 .4em;
+    background-color: white;
+  }
+  &.expanded{
+    $sidemenu-width: 300px;
+    .sidemenu{
+      width: $sidemenu-width;
+      .link{
+        justify-content: left;
+        .text{
+          display: inline-block;
+        }
+      }
+      .user-zone{
+        justify-content: left;
+        padding-left: 1em;
+      }
+      .toggler{
+        text-align: left;
+        padding: 0;
+      }
+    }
+    .view-wrapper{
+      width: calc(100% - #{$sidemenu-width});
+      box-shadow: -1px 0 3px 0 #777;
+    }
+  }
+  .view-app-bar{
+    //box-shadow: 0 1px 3px 0 #777;
+    height: $bar-height;
+    background-color: $theme-color;
+    .title{
+      font-family: Poppins-Bold;
+      color: $theme;
+      font-size: 1.3em;
+      padding: 0 .3em;
+    }
+    .back-to-prev{
+      @extend %appbar-icon;
+      font-size: 1.2em;
+    }
+    .avatar{
+      font-size: .9em;
+    }
+    .appbar-icons{
+      padding: 0 .3em;
+      icon{
+        @extend %appbar-icon;
+      }
+    }
+  }
+  .view-body{
+    height: calc(100%);
+    padding: .3em .3em $bar-height .3em;
+  }
+  .view-bottom-bar{
+    //height: $bottom-bar-height;
+    //box-shadow: 0 -1px 4px 0 #777;
+    background-color: $theme-color;
+    .link{
+      padding: 0 .1em;
+      text-decoration: none;
+      color: #777;
+      icon{
+        --size: 52px;
+        width: var(--size);
+        height: var(--size);
+        line-height: var(--size);
+        font-size: 1.5em;
+        position: relative;
+        top: -10px;
+        margin-bottom: -15px;
+        border-radius: 50%;
+        //box-shadow: 0 -1px 4px 0 white;
+      }
+      .text, span.MuiBottomNavigationAction-label{
+        font-family: Lexend-Medium;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: clip;
+        font-size: .7em;
+      }
+      &.active, &.Mui-selected{
+        color: $theme;
+        icon{
+          background-color: $theme;
+          color: $theme-color;
+          box-shadow: 0 -4px 4px 4px $theme-color;
+          //top: -15px;
+          //margin-bottom: -15px;
+        }
+        .text, span.MuiBottomNavigationAction-label{
+          color: red;
+          display: none !important;
+        }
+      }
+    }
+  }
+}
+
+.presentation{
+  padding: .4em;
+  .grid-filter{
+    padding: 0 .4em;
+    .field-group{
+      padding: 0 .5em;
+      label{
+        padding: .4em;
+        font-family: Lexend-Medium;
+        font-size: .8em;
+      }
+      .field{
+        padding: 0 .3em;
+      }
+    }
+  }
+  .grid{
+    padding: .5em;
+    //background-color: rgba(240,240,240,.5);
+    border-radius: .8em;
+  }
+}
+
+.editor{
+  .head{
+    padding: .4em;
+    .field{
+      background-color: unset;
+      border-bottom: 1px solid $theme;
+      border-radius: 0;
+    }
+    .actions{
+      padding: 0 .4em;
+    }
+  }
+  .ck{
+    &.ck-editor {
+      width: 100%;
+      max-height: 95%;
+      border: 1px solid #ccc;
+      border-radius: .4em;
+      overflow: hidden;
+    }
+    &.ck-toolbar{
+      border: 0;
+    }
+    &.ck-editor__main{
+      height: 90%;
+      max-height: 90%;
+      overflow: hidden;
+      overflow-y: auto;
+    }
+    &.ck-content{
+      min-height: 100%;
+      border: 0 !important;
+      box-shadow: unset !important;
+    }
+  }
+}
+
+.category-editor{
+  padding: 0 .4em;
+  .head{
+    padding: .4em 0;
+    font-family: Poppins;
+    color: #555;
+  }
+}
+
+//@Override
+.MuiFab-root{
+  background-color: $theme !important;
+  icon{
+    color: white;
+  }
+}
+.css-sghohy-MuiButtonBase-root-MuiButton-root{
+  &, &.Mui-focused {
+    background-color: $theme;
+    color: $theme-color;
+  }
+}
+
+@media (min-width: 768px) {
+  $sidemenu-width: 80px;
+  #main-panel{
+    .sidemenu{
+      width: $sidemenu-width;
+    }
+    .view-wrapper{
+      width: calc(100% - #{$sidemenu-width});
+    }
   }
 }

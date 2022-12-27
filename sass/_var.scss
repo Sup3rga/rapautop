@@ -12,3 +12,24 @@ $theme : var(--theme);
 $theme-color: var(--theme-color);
 $header-height: var(--header-height);
 $fonts : (var(--font-family0), var(--font-family1));
+
+@mixin backdrop-filter($value){
+  backdrop-filter: $value;
+  -ms-backdrop-filter: $value;
+  -moz-backdrop-filter: $value;
+  -o-backdrop-filter: $value;
+  -webkit-backdrop-filter: $value;
+}
+
+%appbar-icon{
+  --size: 34px;
+  //width: var(--size);
+  //height: var(--size);
+  //line-height: var(--size);
+  text-align: center;
+  margin: 0 .4em;
+  //font-size: 1.3em;
+  //background-color: rgba(240,240,240,0.4);
+  //border-radius: 50%;
+  cursor: pointer;
+}

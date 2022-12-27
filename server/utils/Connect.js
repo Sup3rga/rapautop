@@ -3,6 +3,7 @@ let mysql = require('mysql'),
 
 class Connect{
    static object = null;
+   static initialized = false;
    static init(){
        Connect.object = mysql.createConnection({
            host: 'localhost',
@@ -10,11 +11,21 @@ class Connect{
            password: '',
            database: 'museautop'
        });
-       Connect.object.connect();
+       try{
+           Connect.object.connect();
+       }catch (e){
+           console.log('[Connection] [ERR]', e);
+           return false;
+       }
+       return true;
    }
 
    static query(sql,options=[],autoCatch=false){
-       Connect.init();
+       if(!Connect.initialized) {
+           if(Connect.init()) {
+               Connect.initialized = true;
+           }
+       }
        return new Promise((res,rej)=>{
            Connect.object.query(sql, options, (err,results,fields)=>{
                if(err && !autoCatch) {

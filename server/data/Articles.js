@@ -1,5 +1,7 @@
-let Storage = require('../utils/Connect'),
-    Channel = require('../utils/Channel');
+let {Connect} = require('../utils/Connect'),
+    Channel = require('../utils/Channel'),
+    AkaDatetime = require('../utils/AkaDatetime'),
+    Data = require('./Data');
 
 class Articles extends Data{
     static list = [];
@@ -37,14 +39,14 @@ class Articles extends Data{
             ],
             sql = !this.saved ?
                 "insert into articles(" +
-                "caption,content, created_at, created_by, reading, likes, dislikes," +
+                "caption,content, created_at, created_by, modified_at, modified_by, reading, likes, dislikes," +
                 "category,branch,post_on" +
-                ") values(?,?,?,?,?,?,?,?,?,?)"
+                ") values(?,?,?,?,?,?,?,?,?,?,?,?)"
                 :
-                "update articles set caption=?, content=?,created_at=?,created_by=?,reading=?,likes=?," +
+                "update articles set caption=?, content=?,modified_at=?,modified_by=?,reading=?,likes=?," +
                 "dislikes=?,category=?,branch=?,post_on=?";
 
-            Storage.query(sql, options).then(()=>{
+            Connect.query(sql, options).then(()=>{
                 res(Channel.message({
                     error: false,
                     message: "successful saving !"
@@ -62,7 +64,7 @@ class Articles extends Data{
            if(!this.saved){
                res(Channel.message());
            }
-           Storage.query("delete from articles where ?", {
+           Connect.query("delete from articles where ?", {
                id: this.id
            }).then(()=>{
                res(Channel.message({
@@ -94,7 +96,7 @@ class Articles extends Data{
 
     static fetchAll(){
         Articles.list = [];
-        Storage.query("select * from articles",null,true).then((e)=>{
+        Connect.query("select * from articles",null,true).then((e)=>{
             Articles.list.push(new Articles().hydrate(e));
         });
     }

@@ -12,7 +12,6 @@ export default class FilterBox extends OverLayer{
             'fb-transition-end'
         ]);
         this.filter = props.default;
-        console.log('[Filter]',this.filter);
         this.state = {
             open: false,
             filter: this.filter

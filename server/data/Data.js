@@ -5,6 +5,8 @@ class Data{
         return this;
     }
     static getById(){}
+    static _getById(){}
+    static getLast(){}
     static fetchAll(){}
 }
 

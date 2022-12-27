@@ -6,7 +6,9 @@ export default class Events{
     static emit(ev,args){
         if(ev in Events.events){
             for(var i in Events.events[ev]){
-                Events.events[ev][i](args);
+                if(!Events.events[ev][i].source || Events.events[ev][i].source.mounted) {
+                    Events.events[ev][i].callback(args);
+                }
             }
         }
         return Events;
@@ -19,11 +21,14 @@ export default class Events{
         return Events;
     }
 
-    static on(ev, callback){
+    static on(ev, callback, source= null){
         if(!(ev in Events.events)){
             Events.events[ev] = [];
         }
-        Events.events[ev].push(callback);
+        Events.events[ev].push({
+            source,
+            callback
+        });
         return Events;
     }
 }

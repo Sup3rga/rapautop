@@ -1,6 +1,8 @@
 let {Connect,Channel} = require('../utils/Connect'),
     Data = require('./Data'),
+    AkaDatetime = require('../utils/AkaDatetime'),
     Filter = require('../utils/Filter');
+const {promisify} = require('util');
 
 class Manager extends Data{
     static list = [];
@@ -19,6 +21,8 @@ class Manager extends Data{
         this.createdBy = null;
         this.active = false;
         this.saved = false;
+        this.token = null;
+        this.branches = [];
     }
 
     save(){
@@ -75,7 +79,7 @@ class Manager extends Data{
     }
 
 
-    hydrate(data) {
+    async hydrate(data) {
         this.id = data.id;
         this.firstname = data.firstname;
         this.lastname = data.lastname;
@@ -87,27 +91,112 @@ class Manager extends Data{
         this.createdBy = data.created_by;
         this.active = data.active == 1;
         this.saved = true;
+        await this.fetchBranch();
         return this;
     }
 
-    data(){
-        return Filter.object(this,[
-            'id','firstname','lastname','mail','nickname','access',
-            'phone','createdAt','createdBy','active'
+    async fetchBranch(){
+        let result = await Connect.query("select distinct b.id, b.domain from communauty c, branch b where c.manager=? and c.branch=b.id",[
+            this.id
         ]);
+        if(result.length){
+            for(let i in result){
+                this.branches.push({
+                    id: result[i].id,
+                    domain: result[i].domain
+                });
+            }
+        }
     }
 
-    static connect(username,password){
-        return new Promise((res)=>{
-           Connect.query("select * from manager where nickname=? and code=SHA1(?)",[username,password])
-               .then((result)=>{
-                   let man = new Manager().hydrate(result[0]);
-                   Manager.connected.push(man);
-                   res(Channel.message({
-                       data: man.data()
-                   }));
-               })
+    data(publicMode = true, personal= false){
+        let list = [
+            'id','firstname','lastname','mail','nickname','access',
+            'phone','createdAt','createdBy','active','branches'
+        ];
+        if(personal){
+            list.push('token');
+        }
+        return Filter.object(this,list);
+    }
+
+    async checkConnection(){
+        let online = null;
+
+        if(!this.saved) return online;
+
+        let data = await Connect.query("select last_seen, token from session_trace where client=?",[
+            this.id
+        ]);
+
+        if(data.length){
+            let date,
+                diff,
+                timeout = new AkaDatetime("00:15:00"),
+                now = new AkaDatetime(new Date());
+            for(let i in data){
+                date = new AkaDatetime(data[i].last_seen);
+                diff = AkaDatetime.diff(now, date);
+                if(diff.isLessThan(timeout)){
+                    online = data[i].token;
+                    break;
+                }
+            }
+        }
+
+        return online;
+    }
+
+    async setSession(){
+        if(!this.saved) return;
+        let onlineToken = await this.checkConnection();
+        if(onlineToken){
+           await Connect.query("update session_trace set last_seen=?",[
+               new AkaDatetime(new Date()).getDateTime()
+           ]);
+        }
+        else{
+            let date = new Date(),
+                now = new AkaDatetime(date).getDateTime();
+            try {
+                await Connect.query("insert into session_trace (client, token, created_at, last_seen) values(?,SHA1(?),?,?)", [
+                    this.id,
+                    date,
+                    now,
+                    now
+                ]);
+                onlineToken = await this.checkConnection();
+            }catch (e){
+                return;
+            }
+        }
+        this.token = onlineToken;
+    }
+
+    setOnline(){
+        Manager.connected.push(this);
+        return this;
+    }
+
+    setOffline(){
+        Manager.connected = Manager.connected.filter((man)=>{
+            if(man != this) return false;
         });
+        return this;
+    }
+
+    static async connect(username,password){
+      let result = await Connect.query("select * from manager where nickname=? and code=SHA1(?)",[username,password]);
+      if(!result.length){
+          return Channel.message();
+      }
+      let man = await new Manager().hydrate(result[0]);
+       await man.setOnline().setSession();
+       return Channel.message({
+           error: false,
+           message: "Success",
+           data: man.data(true, true)
+       });
     }
 }
 

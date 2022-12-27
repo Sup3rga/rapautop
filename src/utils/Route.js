@@ -10,6 +10,17 @@ export default class Route extends React.Component{
         this.state = this.getView();
     }
 
+    static back(){
+        window.history.back();
+    }
+
+    static pushState(url){
+        window.history.pushState(null,'', url);
+        Events.emit('nav', {
+            href: url
+        });
+    }
+
     getView(){
         let routes = Route._routes,
             url = Url.get(),

@@ -1,5 +1,6 @@
 import React from 'react';
 import Events from "../utils/Events";
+import Route from "../utils/Route";
 
 export default class Link extends React.Component{
 
@@ -8,12 +9,9 @@ export default class Link extends React.Component{
     }
 
     render(){
-        return <a className={this.props.className} href={this.props.href} onClick={(e)=>{
+        return <a {...this.props} onClick={(e)=>{
             e.preventDefault();
-            window.history.pushState(null,'', this.props.href);
-            Events.emit('nav', {
-                href: this.props.href
-            });
+            Route.pushState(this.props.href);
         }}>
             {this.props.children}
         </a>
