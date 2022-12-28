@@ -29,8 +29,10 @@ class Connect{
        return new Promise((res,rej)=>{
            Connect.object.query(sql, options, (err,results,fields)=>{
                if(err && !autoCatch) {
-                   console.log('[Err]',err);
                    return rej(err);
+               }
+               else if(err){
+                   Channel.logError(err);
                }
                res(results);
            });

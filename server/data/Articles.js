@@ -1,13 +1,17 @@
 let {Connect} = require('../utils/Connect'),
     Channel = require('../utils/Channel'),
+    Filter = require('../utils/Filter'),
     AkaDatetime = require('../utils/AkaDatetime'),
+    code = require('../utils/ResponseCode'),
     Data = require('./Data');
 
 class Articles extends Data{
     static list = [];
+
     constructor() {
         super();
         this.id = 0;
+        this.title = null;
         this.caption = null;
         this.content = null;
         this.createdAt = null;
@@ -20,68 +24,94 @@ class Articles extends Data{
         this.category = 0;
         this.branch = 0;
         this.postOn = null;
-        this.saved = false;
-    }
-    save(){
-        return new Promise((res,rej)=>{
-            let options = [
-              this.caption, this.content,
-              new AkaDatetime(this.createdAt).getDateTime(),
-              this.createdBy,
-              new AkaDatetime(this.modifiedAt).getDateTime(),
-              this.modifiedBy,
-              this.reading,
-              this.likes,
-              this.dislikes,
-              this.category,
-              this.branch,
-              new AkaDatetime(this.postOn).getDateTime(),
-            ],
-            sql = !this.saved ?
-                "insert into articles(" +
-                "caption,content, created_at, created_by, modified_at, modified_by, reading, likes, dislikes," +
-                "category,branch,post_on" +
-                ") values(?,?,?,?,?,?,?,?,?,?,?,?)"
-                :
-                "update articles set caption=?, content=?,modified_at=?,modified_by=?,reading=?,likes=?," +
-                "dislikes=?,category=?,branch=?,post_on=?";
-
-            Connect.query(sql, options).then(()=>{
-                res(Channel.message({
-                    error: false,
-                    message: "successful saving !"
-                }))
-            }).catch((err)=>{
-                res(Channel.message({
-                    message: "an error during the operation"
-                }))
-            });
-        });
     }
 
-    delete(){
-        return new Promise((res)=>{
-           if(!this.saved){
-               res(Channel.message());
-           }
-           Connect.query("delete from articles where ?", {
-               id: this.id
-           }).then(()=>{
-               res(Channel.message({
-                   error: false,
-                   message: "successful deletion"
-               }))
-           }).catch((err)=>{
-               res(Channel.message());
-           })
-        });
+    data(){
+        return Filter.object(this, [
+           'id', 'title', 'caption','content',
+           'createdAt', 'createdBy', 'modifiedAt',
+           'modifiedBy', 'reading', 'likes','dislikes',
+           'category', 'branch', 'postOn'
+        ]);
+    }
+
+    async save(){
+        if(!Filter.contains(this, [
+            'title','content','createdAt','createdBy','branch', 'postOn','category'
+        ], [null, 0, ''])){
+            return Channel.message({code: code.INVALID});
+        }
+        if(this.id && !Filter.contains(this, ['modifiedBy', 'modifiedAt'])){
+            return Channel.message({code: code.INVALID});
+        }
+        if(!this.id){
+            try{
+                await Connect.query(`
+                    insert into articles (
+                      title,caption,content,created_at,created_by,modified_at,modified_by,
+                      category,branch,post_on
+                    )
+                    values(?,?,?,?,?,?,?,?,?,?)
+                `, [
+                    this.title, this.caption, this.content,
+                    new AkaDatetime(this.createdAt).getDateTime(), this.createdBy,
+                    new AkaDatetime(this.createdAt).getDateTime(), this.createdBy,
+                    this.category, this.branch,
+                    new AkaDatetime(this.postOn).getDateTime()
+                ])
+                return Channel.message({error: false, code: code.SUCCESS});
+            }catch(e){
+                return Channel.logError(e).message({code: code.INTERNAL});
+            }
+        }
+        try{
+            await Connect.query(`
+                update articles set title = ?, caption = ?, content = ?,
+                modified_by = ? , modified_at = ?, category = ?
+                where id = ?
+            `,[
+                this.title, this.caption, this.content, this.modifiedBy,
+                new AkaDatetime(this.modifiedAt).getDateTime(),
+                this.category, this.id
+            ]);
+        }catch (e){
+            return Channel.logError(e).message({code: code.INTERNAL});
+        }
+        return Channel.message({error: false, code: code.SUCCESS});
+    }
+
+    async delete(){
+        if(!this.id){
+            return Channel.message({code: code.INVALID});
+        }
+        try {
+            await Connect.query(`
+                delete
+                from articles
+                where id = ?
+            `, [this.id]);
+        }catch(e){
+            return Channel.logError(e).message({code: code.INTERNAL});
+        }
+        return Channel.message({error: false, code: code.SUCCESS});
     }
 
     hydrate(data){
-        console.log('[data]', data);
+        this.id = data.id;
+        this.title = data.title;
+        this.content = data.content;
+        this.createdBy = data.created_by;
+        this.createdAt = data.created_at;
+        this.modifiedAt = data.modified_at;
+        this.modifiedBy = data.modified_by;
+        this.reading = data.reading;
+        this.likes = data.likes;
+        this.dislikes = data.dislikes;
+        this.category = data.category;
+        this.branch = data.branch;
+        this.postOn = data.post_on;
         return this;
     }
-
 
     static getById(id){
         let occurence = null;
@@ -94,11 +124,15 @@ class Articles extends Data{
         return occurence;
     }
 
-    static fetchAll(){
-        Articles.list = [];
-        Connect.query("select * from articles",null,true).then((e)=>{
-            Articles.list.push(new Articles().hydrate(e));
-        });
+    static async fetchAll(branch = 0){
+        let list = await Connect.query("select * from articles where branch=?",[
+            branch
+        ], true),
+        result = [];
+        for(let i in list){
+            result.push(new Articles().hydrate(list[i]).data());
+        }
+        return result;
     }
 }
 

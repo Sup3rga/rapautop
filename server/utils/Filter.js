@@ -11,10 +11,10 @@ class Filter{
         return result;
     }
 
-    static contains(object,indexes){
+    static contains(object,indexes,nullValues= [null]){
         let checked = true;
         indexes.map((val)=>{
-            if(!(val in object && object[val] != null)){
+            if(!(val in object && nullValues.indexOf(object[val]) < 0)){
                 checked = false;
                 return checked;
             }

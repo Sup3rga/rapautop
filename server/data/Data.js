@@ -1,7 +1,11 @@
 class Data{
+    constructor() {
+        this.createdAt = null;
+        this.createdBy = 0;
+    }
     async save(){}
     async delete(){}
-    hydrate(){
+    hydrate(data){
         return this;
     }
     static getById(){}

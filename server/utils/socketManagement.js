@@ -19,9 +19,14 @@ function manage(socket){
         let message = await article.save();
         socket.emit("article-set");
     })
-    .on('fetch-categories', async(e)=>{
+    .on('/writing', async(e)=>{
         console.log('[fetch]',e);
-        socket.emit("get-categories", await Category.fetchAll(e.branch, e.type == 'writing' ? 'A' : 'P'));
+        let result = {
+            categories: await Category.fetchAll(e.branch, 'A'),
+            articles: await Articles.fetchAll(e.branch)
+        }
+        console.log('[Result]',result);
+        socket.emit("/writing/data", result);
     });
 }
 

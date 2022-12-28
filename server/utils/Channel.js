@@ -1,16 +1,12 @@
+const code = require('./ResponseCode');
 
 class Channel {
-    static code = {
-        success: 100,
-        error: 0,
-        internal: 500
-    }
 
     static message(options={}){
         let message = typeof options == 'string' ? options : "general error"
         let response = {
             error: true,
-            code: Channel.code.success,
+            code: code.ERROR,
             message: message,
             data: []
         };
@@ -22,6 +18,11 @@ class Channel {
             }
         }
         return response;
+    }
+
+    static logError(e){
+        console.log('[Error]',e);
+        return Channel;
     }
 }
 

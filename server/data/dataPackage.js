@@ -1,5 +1,5 @@
 let list = [
-    'Data','Articles','Branch','Manager','Category'
+    'Data','Articles','Branch','Manager','Category','TracableData'
 ],
 modules = {};
 for(let i in list) {
