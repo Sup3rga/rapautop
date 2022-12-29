@@ -19,7 +19,7 @@ const io = new Server(httpServer, {
         origin: 'http://localhost:3000',
         methods: ["GET","POST"]
     }
-})
+});
 
 const ths = new ThunderSpeed();
 

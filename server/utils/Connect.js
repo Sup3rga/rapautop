@@ -1,5 +1,6 @@
 let mysql = require('mysql'),
-    Channel = require('./Channel');
+    Channel = require('./Channel'),
+    PDO = require('./pdo');
 
 class Connect{
    static object = null;
@@ -44,5 +45,12 @@ class Connect{
    }
 }
 
+const Pdo = new PDO({
+    driver: 'mysql',
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'museautop'
+})
 
-module.exports = {Connect,Channel}
+module.exports = {Connect,Channel,Pdo}
