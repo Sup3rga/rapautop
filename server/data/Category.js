@@ -12,7 +12,6 @@ class Category extends TracableData{
         this.name = null;
         this.id = 0;
         this.sector = null;
-        console.log('[This]',this);
     }
 
     async save(){
@@ -104,6 +103,19 @@ class Category extends TracableData{
             Channel.logError(e);
         }
         return result;
+    }
+
+    static async getById(id){
+        let category = null;
+        try {
+            let result = await Connect.query("select * from category where id=?", [id]);
+            if(result.length){
+                category = new Category().hydrate(result[0])
+            }
+        }catch(e){
+            Channel.logError(e);
+        }
+        return category;
     }
 }
 
