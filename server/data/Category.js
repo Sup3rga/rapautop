@@ -63,10 +63,10 @@ class Category extends TracableData{
         this.id = data.id;
         this.name = data.name;
         this.sector = data.attached_to;
-        this.createdAt = data.created_at;
+        this.createdAt = new AkaDatetime(data.created_at).getDateTime();
         this.createdBy = data.created_by;
         this.modifiedBy = data.modified_by;
-        this.modifiedAt = data.modified_at;
+        this.modifiedAt = new AkaDatetime(data.modified_at).getDateTime();
         this.branch = data.branch;
         return this;
     }
@@ -96,11 +96,14 @@ class Category extends TracableData{
     static async fetchAll(branch,type = 'A'){
         let  result = [];
         try {
-            let list = await Connect.query("select * from category where attached_to=? and branch=?", [
-                type, branch
-            ]);
-            if (list.length) {
-                for (let i in list) {
+            let req = await Pdo.prepare("select * from category where attached_to=:p1 and branch=:p2")
+                                .execute({
+                                    p1: type,
+                                    p2: branch
+                                });
+            if (req.rowCount) {
+                let data;
+                while(data = req.fetch()) {
                     result.push(new Category().hydrate(data).data());
                 }
             }
@@ -113,9 +116,11 @@ class Category extends TracableData{
     static async getById(id){
         let category = null;
         try {
-            let result = await Connect.query("select * from category where id=?", [id]);
-            if(result.length){
-                category = new Category().hydrate(result[0])
+            let request = await Pdo.prepare("select * from category where id=:id")
+                                    .execute({id});
+            console.log('[count]',request.rowCount);
+            if(request.rowCount){
+                category = new Category().hydrate(request.fetch());
             }
         }catch(e){
             Channel.logError(e);

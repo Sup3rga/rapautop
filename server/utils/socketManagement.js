@@ -1,6 +1,7 @@
 let {Articles,Category} = require('../data/dataPackage');
 const code = require('../utils/ResponseCode'),
       Channel = require('../utils/Channel');
+const Filter = require("./Filter");
 
 async function saveCategory(sector, data, socket){
     let message = [],
@@ -8,7 +9,8 @@ async function saveCategory(sector, data, socket){
         category, update;
     for(let i in save){
         update = 'id' in save[i];
-        category = update ? Category.getById(save[i].id) : new Category();
+        category = update ? await Category.getById(save[i].id) : new Category();
+        // console.log('[update]',save[i], category);
         if(category) {
             category.name = save[i].name;
             category.id = update ? save[i].id : 0;
@@ -23,7 +25,6 @@ async function saveCategory(sector, data, socket){
                 category.createdBy = data.cmid;
             }
             const request = await category.save();
-            console.log('[request]',request);
             if(request.error){
                 message.push('[ID] ' + save[i].id + ' :: error during operation');
             }
@@ -49,7 +50,7 @@ async function saveCategory(sector, data, socket){
         error : false,
         code : code.SUCCESS,
         message: message,
-        data : await Articles.fetchAll(data.bhid, 'A')
+        data : await Category.fetchAll(data.bhid, sector)
     }))
 }
 
@@ -58,19 +59,47 @@ function manage(socket){
     socket.on("disconnecting", ()=>{
         console.log('disconnected');
     })
-    socket.on('submit-article', async (e)=>{
-        console.log('[Article]',e);
-        let article = new Articles();
-        article.title = e.title;
-        article.content = e.content;
-        article.createdAt = new Date();
-        article.modifiedAt = new Date();
-        article.createdBy = e.cmid;
-        article.modifiedBy = e.cmid;
-        article.postOn = new Date();
-        article.category = null;
-        let message = await article.save();
-        socket.emit("article-set");
+    socket.on('/writing/write', async (data)=>{
+        console.log('[Article]',data);
+        if(Filter.contains(data, [
+            'title','content', 'img','cmid','bhid','cmtk', 'category'
+        ])){
+            const update = 'id' in data;
+            let article = update ? await Articles.getById(data.id) : new Articles();
+            article.title = data.title;
+            article.content = data.content;
+            article.caption = 'caption' in data ? data.caption : null;
+            if(!update){
+                article.createdAt = new Date();
+                article.createdBy = data.cmid;
+                article.postOn = new Date();
+                article.category = data.category;
+                article.branch = data.bhid;
+            }
+            else {
+                if(data.bhid !== article.branch){
+                    return socket.emit("/writing/write/response",Channel.message({
+                        code: code.INVALID
+                    }));
+                }
+                article.modifiedAt = new Date();
+                article.modifiedBy = data.cmid;
+            }
+            let message = await article.save();
+            socket.emit("/writing/write/response", message);
+        }
+        else {
+            return socket.emit("/writing/write/response",Channel.message({
+                code: code.INVALID
+            }));
+        }
+    })
+    .on('/writing/category/fetch', async(data)=>{
+        socket.emit("/writing/category/get", Channel.message({
+            error: false,
+            code: code.SUCCESS,
+            data: await Category.fetchAll(data.bhid, 'A')
+        }));
     })
     .on('/writing', async(e)=>{
         console.log('[fetch]',e);
@@ -79,7 +108,11 @@ function manage(socket){
             articles: await Articles.fetchAll(e.bhid)
         }
         console.log('[Result]',result);
-        socket.emit("/writing/data", result);
+        socket.emit("/writing/data", Channel.message({
+            error: false,
+            code : code.SUCCESS,
+            data: result
+        }));
     })
     .on('/writing/category/set', async(data)=>{
         await saveCategory('A', data, socket);

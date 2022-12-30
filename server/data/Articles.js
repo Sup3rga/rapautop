@@ -1,4 +1,4 @@
-let {Connect} = require('../utils/Connect'),
+let {Pdo} = require('../utils/Connect'),
     Channel = require('../utils/Channel'),
     Filter = require('../utils/Filter'),
     AkaDatetime = require('../utils/AkaDatetime'),
@@ -36,6 +36,7 @@ class Articles extends Data{
     }
 
     async save(){
+        console.log('[This]',this);
         if(!Filter.contains(this, [
             'title','content','createdAt','createdBy','branch', 'postOn','category'
         ], [null, 0, ''])){
@@ -46,34 +47,44 @@ class Articles extends Data{
         }
         if(!this.id){
             try{
-                await Connect.query(`
+                await Pdo.prepare(`
                     insert into articles (
                       title,caption,content,created_at,created_by,modified_at,modified_by,
                       category,branch,post_on
                     )
-                    values(?,?,?,?,?,?,?,?,?,?)
-                `, [
-                    this.title, this.caption, this.content,
-                    new AkaDatetime(this.createdAt).getDateTime(), this.createdBy,
-                    new AkaDatetime(this.createdAt).getDateTime(), this.createdBy,
-                    this.category, this.branch,
-                    new AkaDatetime(this.postOn).getDateTime()
-                ])
+                    values(:p1,:p2,:p3,:p4,:p5,:p4,:p5,:p6,:p7,:p8)
+                `)
+                .execute({
+                    p1: this.title,
+                    p2: this.caption,
+                    p3: this.content,
+                    p4: new AkaDatetime(this.createdAt).getDateTime(),
+                    p5: this.createdBy,
+                    p6: this.category,
+                    p7: this.branch,
+                    p8: new AkaDatetime(this.postOn).getDateTime()
+                });
                 return Channel.message({error: false, code: code.SUCCESS});
             }catch(e){
                 return Channel.logError(e).message({code: code.INTERNAL});
             }
         }
         try{
-            await Connect.query(`
-                update articles set title = ?, caption = ?, content = ?,
-                modified_by = ? , modified_at = ?, category = ?
-                where id = ?
-            `,[
-                this.title, this.caption, this.content, this.modifiedBy,
-                new AkaDatetime(this.modifiedAt).getDateTime(),
-                this.category, this.id
-            ]);
+            await Pdo.prepare(`
+                update articles set title = :p1, caption = :p2, content = :p3,
+                modified_by = :p5 , modified_at = :p4, category = :p6
+                where id = :p7 and branch = :p8
+            `)
+            .execute({
+                p1: this.title,
+                p2: this.caption,
+                p3: this.content,
+                p4: new AkaDatetime(this.createdAt).getDateTime(),
+                p5: this.createdBy,
+                p6: this.category,
+                p7: this.id,
+                p8: this.branch
+            })
         }catch (e){
             return Channel.logError(e).message({code: code.INTERNAL});
         }
@@ -85,11 +96,8 @@ class Articles extends Data{
             return Channel.message({code: code.INVALID});
         }
         try {
-            await Connect.query(`
-                delete
-                from articles
-                where id = ?
-            `, [this.id]);
+            await Pdo.prepare("delete from articles where id=?")
+                .execute({id: this.id});
         }catch(e){
             return Channel.logError(e).message({code: code.INTERNAL});
         }
@@ -113,24 +121,31 @@ class Articles extends Data{
         return this;
     }
 
-    static getById(id){
-        let occurence = null;
-        Articles.list.forEach((article)=>{
-            if(article.id == id){
-                occurence = article;
-                return 0;
+    static async getById(id){
+        let article = null;
+        try{
+            const req = await Pdo.prepare("select * from articles where id=:id")
+                .execute({id});
+            if(req.rowCount){
+                article = new Articles().hydrate(req.fetch());
             }
-        });
-        return occurence;
+        }catch(e){
+            Channel.logError(e);
+        }
+        return article;
     }
 
     static async fetchAll(branch = 0){
-        let list = await Connect.query("select * from articles where branch=?",[
-            branch
-        ], true),
-        result = [];
-        for(let i in list){
-            result.push(new Articles().hydrate(list[i]).data());
+        let result = [];
+        try {
+            const req = await Pdo.prepare("select * from articles where branch=:branch")
+                .execute({branch});
+            let data;
+            while(data = req.fetch()){
+                result.push(new Articles().hydrate(data).data());
+            }
+        }catch(e){
+            Channel.logError(e);
         }
         return result;
     }
