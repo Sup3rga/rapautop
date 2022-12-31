@@ -23,6 +23,9 @@ class PDOResult{
         return r;
     }
 
+    closeCursor(){
+
+    }
 }
 
 class PDO {
@@ -109,7 +112,7 @@ class PDO {
                     if (!(_var in arg)) {
                         throw new Error("arguments [ " + _var + " ] is not given !");
                     }
-                    finalSql += /^[\d]+$/.test(arg[_var]) ? parseFloat(arg[_var]) : arg[_var] === undefined ? 'NULL' : "'" + (arg[_var].toString().replace(/'/g, "\\'")) + "'";
+                    finalSql += /^[\d]+$/.test(arg[_var]) ? parseFloat(arg[_var]) : [undefined, null].indexOf(arg[_var]) >= 0 ? 'NULL' : "'" + (arg[_var].toString().replace(/'/g, "\\'")) + "'";
                     _ignore.push(_var);
                     _var = '';
                 }

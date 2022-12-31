@@ -2,6 +2,7 @@ let {Articles,Category} = require('../data/dataPackage');
 const code = require('../utils/ResponseCode'),
       Channel = require('../utils/Channel');
 const Filter = require("./Filter");
+const {is_array,isset} = require('./procedures');
 
 async function saveCategory(sector, data, socket){
     let message = [],
@@ -62,18 +63,26 @@ function manage(socket){
     socket.on('/writing/write', async (data)=>{
         console.log('[Article]',data);
         if(Filter.contains(data, [
-            'title','content', 'img','cmid','bhid','cmtk', 'category'
+            'title','content', 'img','cmid','bhid','cmtk', 'category',
+            //'schdate'
         ])){
             const update = 'id' in data;
             let article = update ? await Articles.getById(data.id) : new Articles();
             article.title = data.title;
             article.content = data.content;
-            article.caption = 'caption' in data ? data.caption : null;
+            article.category = data.category;
+            if(is_array(data.img)){
+                article.pictures = data.img;
+            }
             if(!update){
                 article.createdAt = new Date();
                 article.createdBy = data.cmid;
-                article.postOn = new Date();
-                article.category = data.category;
+                if(isset(data.schdate) && AkaDatetime.isDateTime(data.schdate)){
+                    article.postOn = data.schdate;
+                }
+                else{
+                    article.postOn = new Date();
+                }
                 article.branch = data.bhid;
             }
             else {
@@ -102,12 +111,10 @@ function manage(socket){
         }));
     })
     .on('/writing', async(e)=>{
-        console.log('[fetch]',e);
         let result = {
             categories: await Category.fetchAll(e.bhid, 'A'),
             articles: await Articles.fetchAll(e.bhid)
         }
-        console.log('[Result]',result);
         socket.emit("/writing/data", Channel.message({
             error: false,
             code : code.SUCCESS,

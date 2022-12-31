@@ -17,6 +17,16 @@ function is_array(val){
     return Array.isArray(val);
 }
 
+function filter(list, val){
+    const _list = [];
+    for(let i in list){
+        if(list[i] != val){
+            _list.push(list[i]);
+        }
+    }
+    return _list;
+}
+
 function base64_decode(base64){
     return buffer_base64(base64).toString('binary');
 }
@@ -46,5 +56,6 @@ async function unlink(filename){
 
 module.exports = {
     isset,empty,time,is_array,base64_decode,
-    is_file,rename,unlink,buffer_base64
+    is_file,rename,unlink,buffer_base64,
+    filter
 };

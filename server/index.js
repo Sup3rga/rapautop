@@ -5,7 +5,7 @@ let express = require('express'),
     {Server} = require('socket.io'),
     AKAD = require('./utils/AkaDatetime'),
     bodyParser = require('body-parser'),
-    {Manager} = require('./data/dataPackage'),
+    {Manager, Pictures} = require('./data/dataPackage'),
     ThunderSpeed = require('./utils/thunderspeed.server'),
     manage = require('./utils/socketManagement'),
     Filter = require('./utils/Filter');
@@ -55,8 +55,9 @@ server
         image = '';
     for(let i in upl_artimg){
         if(ths.isUploaded(upl_artimg[i])){
-            image = '/assets/captions/'+upl_artimg[i];
-            await ths.move(upl_artimg[i], '../public/assets/captions/', upl_artimg[i]);
+            const dest = await Pictures.nextName('A') + '.' + Pictures.extension(upl_artimg[i]);
+            image = '/assets/captions/'+dest;
+            await ths.move(upl_artimg[i], '../public/assets/captions/', dest);
         }
     }
     res.json({

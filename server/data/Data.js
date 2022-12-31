@@ -8,10 +8,9 @@ class Data{
     hydrate(data){
         return this;
     }
-    static getById(){}
-    static _getById(){}
-    static getLast(){}
-    static fetchAll(){}
+    static async getById(){}
+    static async getLast(){}
+    static async fetchAll(){}
 }
 
 module.exports = Data;
