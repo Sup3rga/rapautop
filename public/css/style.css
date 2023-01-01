@@ -353,16 +353,24 @@
   padding: .4em;
 }
 /* line 291, ../../sass/style.scss */
-.editor .head .field {
-  background-color: unset;
-  border-bottom: 1px solid #12172d;
-  border-radius: 0;
+.editor .head .title {
+  font-family: Lexend-Medium;
+  font-size: 1.2em;
+  padding: 0 .4em;
 }
-/* line 296, ../../sass/style.scss */
+/* line 295, ../../sass/style.scss */
+.editor .head .title.empty {
+  color: #777;
+}
+/* line 299, ../../sass/style.scss */
 .editor .head .actions {
   padding: 0 .4em;
 }
 /* line 301, ../../sass/style.scss */
+.editor .head .actions button {
+  margin-right: .3em;
+}
+/* line 307, ../../sass/style.scss */
 .editor .ck.ck-editor {
   width: 100%;
   max-height: 95%;
@@ -370,56 +378,56 @@
   border-radius: .4em;
   overflow: hidden;
 }
-/* line 308, ../../sass/style.scss */
+/* line 314, ../../sass/style.scss */
 .editor .ck.ck-toolbar {
   border: 0;
 }
-/* line 311, ../../sass/style.scss */
+/* line 317, ../../sass/style.scss */
 .editor .ck.ck-editor__main {
   height: 90%;
   max-height: 90%;
   overflow: hidden;
   overflow-y: auto;
 }
-/* line 317, ../../sass/style.scss */
+/* line 323, ../../sass/style.scss */
 .editor .ck.ck-content {
   min-height: 100%;
   border: 0 !important;
   box-shadow: unset !important;
 }
 
-/* line 325, ../../sass/style.scss */
+/* line 331, ../../sass/style.scss */
 .category-editor {
   padding: 0 .4em;
 }
-/* line 327, ../../sass/style.scss */
+/* line 333, ../../sass/style.scss */
 .category-editor .head {
   padding: .4em 0;
   font-family: Poppins;
   color: #555;
 }
 
-/* line 335, ../../sass/style.scss */
+/* line 341, ../../sass/style.scss */
 .MuiFab-root {
   background-color: #12172d !important;
 }
-/* line 337, ../../sass/style.scss */
+/* line 343, ../../sass/style.scss */
 .MuiFab-root icon {
   color: white;
 }
 
-/* line 342, ../../sass/style.scss */
+/* line 348, ../../sass/style.scss */
 .css-sghohy-MuiButtonBase-root-MuiButton-root, .css-sghohy-MuiButtonBase-root-MuiButton-root.Mui-focused {
   background-color: #12172d;
   color: white;
 }
 
 @media (min-width: 768px) {
-  /* line 351, ../../sass/style.scss */
+  /* line 357, ../../sass/style.scss */
   #main-panel .sidemenu {
     width: 80px;
   }
-  /* line 354, ../../sass/style.scss */
+  /* line 360, ../../sass/style.scss */
   #main-panel .view-wrapper {
     width: calc(100% - 80px);
   }

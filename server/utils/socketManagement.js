@@ -3,6 +3,7 @@ const code = require('../utils/ResponseCode'),
       Channel = require('../utils/Channel');
 const Filter = require("./Filter");
 const {is_array,isset} = require('./procedures');
+const AkaDatetime = require('./AkaDatetime');
 
 async function saveCategory(sector, data, socket){
     let message = [],
@@ -77,6 +78,7 @@ function manage(socket){
             if(!update){
                 article.createdAt = new Date();
                 article.createdBy = data.cmid;
+                console.log('[Aka]',AkaDatetime.isDateTime);
                 if(isset(data.schdate) && AkaDatetime.isDateTime(data.schdate)){
                     article.postOn = data.schdate;
                 }

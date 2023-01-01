@@ -52,7 +52,16 @@ class PDO {
         this.dbname = typeof dbname == 'undefined' ? './library.db' : dbname;
         this.sqlString = '';
         this.driver = options.driver;
-        this.setDriver(config);
+        this.connected = false;
+        this.logError = null;
+        const timer = setInterval((e)=>{
+            try{
+                this.setDriver(config);
+                this.connected = true;
+            }catch (e){
+                this.logError = e;
+            }
+        }, 300);
         this.results = {};
         this.queue = [];
         this.cursor = 0;
@@ -66,7 +75,11 @@ class PDO {
         if(driverName == 'mysql'){
             const mysql = require('mysql');
             this.db = mysql.createConnection(options);
-            this.db.connect();
+            try {
+                this.db.connect();
+            }catch(e){
+                throw new Error(e);
+            }
         }
         else if(driverName == 'sqlite'){
             const sqlite = require('sqlite3').verbose();
@@ -139,7 +152,9 @@ class PDO {
                 }
             }
         }
-
+        if(!this.connected){
+            throw new Error(this.logError);
+        }
         if(this.driver == 'mysql'){
             let results = await (($this)=>{
                 return new Promise((res,rej)=>{

@@ -288,13 +288,19 @@ $bottom-bar-height: 60px;
 .editor{
   .head{
     padding: .4em;
-    .field{
-      background-color: unset;
-      border-bottom: 1px solid $theme;
-      border-radius: 0;
+    .title{
+      font-family: Lexend-Medium;
+      font-size: 1.2em;
+      padding: 0 .4em;
+      &.empty{
+        color: #777;
+      }
     }
     .actions{
       padding: 0 .4em;
+      button{
+        margin-right: .3em;
+      }
     }
   }
   .ck{

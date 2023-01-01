@@ -503,6 +503,9 @@ h1{
 //Width
 @for  $i from 1 through 12 {
   .ui-size-#{$i}{width: #{100% * $i/ 12};}
+  .ui-vwidth-#{$i}{
+    width: #{100vw * $i / 12};;
+  }
 }
 //Height
 .ui-fluid-height{
@@ -753,8 +756,9 @@ $prefixes: sm, md, lg, xl;
       height: 100vh;
     }
     @for  $i from 1 through 12 {
-        .ui-#{nth($prefixes, $k)}-size-#{$i}{width: #{100% * $i/ 12};}
-      }
+      .ui-#{nth($prefixes, $k)}-size-#{$i}{width: #{100% * $i/ 12};}
+      .ui-#{nth($prefixes, $k)}-vwidth-#{$i}{width: #{100vw * $i / 12};;}
+    }
 
    //Height
     .ui-#{nth($prefixes, $k)}-fluid-height{
