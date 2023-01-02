@@ -62,13 +62,15 @@ function manage(socket){
         console.log('disconnected');
     })
     socket.on('/writing/write', async (data)=>{
-        console.log('[Article]',data);
+        // console.log('[Article]',data);
         if(Filter.contains(data, [
             'title','content', 'img','cmid','bhid','cmtk', 'category',
-            //'schdate'
+            'schdate'
         ])){
+
             const update = 'id' in data;
             let article = update ? await Articles.getById(data.id) : new Articles();
+            // console.log('[UPDATE]',article);
             article.title = data.title;
             article.content = data.content;
             article.category = data.category;
@@ -78,13 +80,6 @@ function manage(socket){
             if(!update){
                 article.createdAt = new Date();
                 article.createdBy = data.cmid;
-                console.log('[Aka]',AkaDatetime.isDateTime);
-                if(isset(data.schdate) && AkaDatetime.isDateTime(data.schdate)){
-                    article.postOn = data.schdate;
-                }
-                else{
-                    article.postOn = new Date();
-                }
                 article.branch = data.bhid;
             }
             else {
@@ -95,6 +90,16 @@ function manage(socket){
                 }
                 article.modifiedAt = new Date();
                 article.modifiedBy = data.cmid;
+            }
+            if(
+                update &&
+                isset(data.schdate) && AkaDatetime.isDateTime(data.schdate) &&
+                !article.published
+            ){
+                article.postOn = data.schdate;
+            }
+            else if(!update){
+                article.postOn = new Date();
             }
             let message = await article.save();
             socket.emit("/writing/write/response", message);

@@ -158,6 +158,7 @@ class Articles extends Data{
         this.pictures = [];
         this.category = 0;
         this.branch = 0;
+        this.published = false;
         this.postOn = null;
     }
 
@@ -166,7 +167,7 @@ class Articles extends Data{
            'id', 'title', 'caption','content',
            'createdAt', 'createdBy', 'modifiedAt',
            'modifiedBy', 'reading', 'likes','dislikes',
-           'category', 'branch', 'postOn'
+           'category', 'branch', 'postOn','published'
         ]);
         if(data.caption) {
             data.caption = await (await ArticleImage.getById(data.caption)).data();
@@ -235,7 +236,8 @@ class Articles extends Data{
                         content     = :p3,
                         modified_by = :p5,
                         modified_at = :p4,
-                        category    = :p6
+                        category    = :p6,
+                        post_on = :p9
                     where id = :p7
                       and branch = :p8
                 `)
@@ -246,7 +248,8 @@ class Articles extends Data{
                     p5: this.createdBy,
                     p6: this.category,
                     p7: this.id,
-                    p8: this.branch
+                    p8: this.branch,
+                    p9: this.postOn
                 });
             }
         }catch (e){
@@ -295,7 +298,9 @@ class Articles extends Data{
         this.dislikes = data.dislikes;
         this.category = data.category;
         this.branch = data.branch;
-        this.postOn = new AkaDatetime(data.post_on).getDateTime();
+        const postDate = new AkaDatetime(data.post_on);
+        this.postOn = postDate.getDateTime();
+        this.published = postDate.isLessThan(new AkaDatetime());
         return this;
     }
 
