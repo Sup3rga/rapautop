@@ -2,6 +2,7 @@ let {Connect,Channel, Pdo} = require('../utils/Connect'),
     Filter = require('../utils/Filter'),
     code = require('../utils/ResponseCode'),
     AkaDatetime = require('../utils/AkaDatetime'),
+    Manager = require('./Manager'),
     TracableData = require('./TracableData');
 
 class Category extends TracableData{
@@ -71,12 +72,15 @@ class Category extends TracableData{
         return this;
     }
 
-    data(){
-        return Filter.object(this, [
+    async data(){
+        const data = Filter.object(this, [
             'id', 'name', 'createdBy','createdAt',
             'modifiedAt','modifiedBy', 'branch',
             'sector'
         ]);
+        data.createdBy = await (await Manager.getById(data.createdBy)).data(true, false, true);
+        data.modifiedBy = await (await Manager.getById(data.modifiedBy)).data(true, false, true);
+        return data;
     }
 
     async delete(){
@@ -93,7 +97,7 @@ class Category extends TracableData{
         return Channel.message({error: false, code: code.SUCCESS});
     }
 
-    static async fetchAll(branch,type = 'A'){
+    static async fetchAll(branch,type = 'A', dataOnly = true){
         let  result = [];
         try {
             let req = await Pdo.prepare("select * from category where attached_to=:p1 and branch=:p2")
@@ -102,9 +106,13 @@ class Category extends TracableData{
                                     p2: branch
                                 });
             if (req.rowCount) {
-                let data;
+                let data,res;
                 while(data = req.fetch()) {
-                    result.push(new Category().hydrate(data).data());
+                    res = new Category().hydrate(data);
+                    if(dataOnly){
+                        res = await res.data();
+                    }
+                    result.push(res);
                 }
             }
         }catch(e){

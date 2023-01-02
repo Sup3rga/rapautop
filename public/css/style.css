@@ -407,27 +407,89 @@
   color: #555;
 }
 
-/* line 341, ../../sass/style.scss */
+/* line 340, ../../sass/style.scss */
+.article-list {
+  padding: .4em;
+}
+/* line 342, ../../sass/style.scss */
+.article-list .article-preview {
+  padding: .4em;
+  text-decoration: none;
+  color: black;
+  font-family: Roboto;
+  border-bottom: 1px solid #eee;
+  border-top: 1px solid #eee;
+}
+/* line 349, ../../sass/style.scss */
+.article-list .article-preview .caption {
+  height: 20vmin;
+  background-color: #eee;
+  border-radius: 1em;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+/* line 357, ../../sass/style.scss */
+.article-list .article-preview .metadata {
+  padding: 0 0 0 .5em;
+}
+/* line 359, ../../sass/style.scss */
+.article-list .article-preview .metadata .title {
+  font-family: Lexend-Medium;
+  font-size: 1.2em;
+}
+/* line 363, ../../sass/style.scss */
+.article-list .article-preview .metadata .grid {
+  padding: .2em;
+}
+/* line 365, ../../sass/style.scss */
+.article-list .article-preview .metadata .grid .item {
+  padding: 0 .5em;
+}
+/* line 367, ../../sass/style.scss */
+.article-list .article-preview .metadata .grid .item icon {
+  font-size: 1.2em;
+}
+/* line 370, ../../sass/style.scss */
+.article-list .article-preview .metadata .grid .item .label {
+  padding: .2em;
+  font-family: Poppins;
+}
+/* line 376, ../../sass/style.scss */
+.article-list .article-preview .metadata .else {
+  padding: .3em 0;
+}
+/* line 378, ../../sass/style.scss */
+.article-list .article-preview .metadata .else label {
+  font-size: .9em;
+  font-family: Roboto-Light;
+}
+/* line 382, ../../sass/style.scss */
+.article-list .article-preview .metadata .else span {
+  padding-left: .4em;
+}
+
+/* line 391, ../../sass/style.scss */
 .MuiFab-root {
   background-color: #12172d !important;
 }
-/* line 343, ../../sass/style.scss */
+/* line 393, ../../sass/style.scss */
 .MuiFab-root icon {
   color: white;
 }
 
-/* line 348, ../../sass/style.scss */
+/* line 398, ../../sass/style.scss */
 .css-sghohy-MuiButtonBase-root-MuiButton-root, .css-sghohy-MuiButtonBase-root-MuiButton-root.Mui-focused {
   background-color: #12172d;
   color: white;
 }
 
 @media (min-width: 768px) {
-  /* line 357, ../../sass/style.scss */
+  /* line 407, ../../sass/style.scss */
   #main-panel .sidemenu {
     width: 80px;
   }
-  /* line 360, ../../sass/style.scss */
+  /* line 410, ../../sass/style.scss */
   #main-panel .view-wrapper {
     width: calc(100% - 80px);
   }

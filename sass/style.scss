@@ -337,6 +337,56 @@ $bottom-bar-height: 60px;
   }
 }
 
+.article-list{
+  padding: .4em;
+  .article-preview{
+    padding: .4em;
+    text-decoration: none;
+    color: black;
+    font-family: Roboto;
+    border-bottom: 1px solid #eee;
+    border-top: 1px solid #eee;
+    .caption{
+      height: 20vmin;
+      background-color: #eee;
+      border-radius: 1em;
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    .metadata{
+      padding: 0 0 0 .5em;
+      .title{
+        font-family: Lexend-Medium;
+        font-size: 1.2em;
+      }
+      .grid{
+        padding: .2em;
+        .item{
+          padding: 0 .5em;
+          icon{
+            font-size: 1.2em;
+          }
+          .label{
+            padding: .2em;
+            font-family: Poppins;
+          }
+        }
+      }
+      .else{
+        padding: .3em 0;
+        label{
+          font-size: .9em;
+          font-family: Roboto-Light;
+        }
+        span{
+          padding-left: .4em;
+        }
+      }
+    }
+  }
+}
+
 //@Override
 .MuiFab-root{
   background-color: $theme !important;

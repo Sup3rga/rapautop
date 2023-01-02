@@ -1,4 +1,4 @@
-let {Connect,Channel} = require('../utils/Connect'),
+let {Connect,Channel, Pdo} = require('../utils/Connect'),
     Data = require('./Data'),
     AkaDatetime = require('../utils/AkaDatetime'),
     Filter = require('../utils/Filter');
@@ -78,7 +78,6 @@ class Manager extends Data{
         });
     }
 
-
     async hydrate(data) {
         this.id = data.id;
         this.firstname = data.firstname;
@@ -109,15 +108,21 @@ class Manager extends Data{
         }
     }
 
-    data(publicMode = true, personal= false){
-        let list = [
+    async data(publicMode = true, personal= false, essentials=false){
+        let list = essentials ? ['id', 'firstname', 'lastname'] :
+        [
             'id','firstname','lastname','mail','nickname','access',
             'phone','createdAt','createdBy','active','branches'
         ];
         if(personal){
             list.push('token');
         }
-        return Filter.object(this,list);
+        const data = Filter.object(this,list);
+        const creator = data.createdBy ? await Manager.getById(data.createdBy) : null;
+        if(creator) {
+            data.createdBy = await creator.data(true, false, true);
+        }
+        return data;
     }
 
     async checkConnection(){
@@ -185,6 +190,20 @@ class Manager extends Data{
         return this;
     }
 
+    static async getById(id){
+        let manager = null;
+        try{
+            const request = await Pdo.prepare("select * from manager where id=:id")
+                .execute({id});
+            if(request.rowCount){
+                manager = new Manager().hydrate(request.fetch());
+            }
+        }catch (e){
+            Channel.logError(e);
+        }
+        return manager;
+    }
+
     static async connect(username,password){
       let result = await Connect.query("select * from manager where nickname=? and code=SHA1(?)",[username,password]);
       if(!result.length){
@@ -195,7 +214,7 @@ class Manager extends Data{
        return Channel.message({
            error: false,
            message: "Success",
-           data: man.data(true, true)
+           data: await man.data(true, true)
        });
     }
 }

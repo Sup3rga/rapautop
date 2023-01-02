@@ -2,9 +2,11 @@ let {Pdo} = require('../utils/Connect'),
     Channel = require('../utils/Channel'),
     Filter = require('../utils/Filter'),
     Pictures = require('./Pictures'),
+    Data = require('./Data'),
+    Manager = require('./Manager'),
+    Category = require('./Category'),
     AkaDatetime = require('../utils/AkaDatetime'),
     code = require('../utils/ResponseCode'),
-    Data = require('./Data'),
     {filter} = require('../utils/procedures');
 
 class ArticleImage extends Data{
@@ -24,6 +26,10 @@ class ArticleImage extends Data{
             return Channel.logError(e).message({code: code.INTERNAL});
         }
         return Channel.message({code: code.SUCCESS});
+    }
+
+    async data(){
+        return Filter.object(this, ['id', 'path', 'article', 'picture']);
     }
 
     async delete(){
@@ -57,7 +63,7 @@ class ArticleImage extends Data{
         if(img){
             try {
                 const req = await Pdo.prepare("select distinct a.*, p.path from articles_pictures a, pictures p where a.img=:img and p.id = a.img")
-                    .execute({img});
+                    .execute({img : img.id});
                 if(req.rowCount){
                     res = new ArticleImage().hydrate(req.fetch());
                 }
@@ -66,6 +72,20 @@ class ArticleImage extends Data{
             }
         }
         return nullValue ? res : res ? res : new ArticleImage();
+    }
+
+    static async getById(id){
+        let res = null;
+        try {
+            const req = await Pdo.prepare("select distinct a.*, p.path from articles_pictures a, pictures p where a.id=:id and p.id = a.img")
+                .execute({id});
+            if(req.rowCount){
+                res = new ArticleImage().hydrate(req.fetch());
+            }
+        }catch (e) {
+            Channel.logError(e);
+        }
+        return res;
     }
 
     static async fetchAll(id){
@@ -141,13 +161,22 @@ class Articles extends Data{
         this.postOn = null;
     }
 
-    data(){
-        return Filter.object(this, [
+    async data(){
+        const data = Filter.object(this, [
            'id', 'title', 'caption','content',
            'createdAt', 'createdBy', 'modifiedAt',
            'modifiedBy', 'reading', 'likes','dislikes',
            'category', 'branch', 'postOn'
         ]);
+        if(data.caption) {
+            data.caption = await (await ArticleImage.getById(data.caption)).data();
+            data.caption = data.caption.path;
+        }
+        data.createdBy = await (await Manager.getById(data.createdBy)).data(true, false, true);
+        data.modifiedBy = await (await Manager.getById(data.modifiedBy)).data(true, false, true);
+        data.category = await (await Category.getById(data.category)).data();
+        data.category = Filter.object(data.category, ['id', 'name', 'sector']);
+        return data;
     }
 
     async save(){
@@ -256,6 +285,7 @@ class Articles extends Data{
         this.id = data.id;
         this.title = data.title;
         this.content = data.content;
+        this.caption = data.caption;
         this.createdBy = data.created_by;
         this.createdAt = new AkaDatetime(data.created_at).getDateTime();
         this.modifiedAt = new AkaDatetime(data.modified_at).getDateTime();
@@ -265,7 +295,7 @@ class Articles extends Data{
         this.dislikes = data.dislikes;
         this.category = data.category;
         this.branch = data.branch;
-        this.postOn = data.post_on;
+        this.postOn = new AkaDatetime(data.post_on).getDateTime();
         return this;
     }
 
@@ -303,14 +333,18 @@ class Articles extends Data{
         return article;
     }
 
-    static async fetchAll(branch = 0){
+    static async fetchAll(branch = 0, dataOnly = true){
         let result = [];
         try {
             const req = await Pdo.prepare("select * from articles where branch=:branch")
                 .execute({branch});
-            let data;
+            let data, res;
             while(data = req.fetch()){
-                result.push(new Articles().hydrate(data).data());
+                res = new Articles().hydrate(data);
+                if(dataOnly){
+                    res = await res.data();
+                }
+                result.push(res);
             }
         }catch(e){
             Channel.logError(e);

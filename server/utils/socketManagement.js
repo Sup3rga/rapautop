@@ -129,6 +129,32 @@ function manage(socket){
     .on('/punchline/category/set', async (e) => {
         await saveCategory('P', data, socket);
     })
+    .on('/articles', async(data)=>{
+        if(Filter.contains(data, [
+            'artid','cmid','bhid','cmtk'
+        ])){
+            const article = await Articles.getById(data.artid);
+            if(article){
+                socket.emit("/articles/get", Channel.message({
+                    error: false,
+                    code: code.SUCCESS,
+                    data: await article.data()
+                }));
+            }
+            else{
+                socket.emit("/articles/get", Channel.message({
+                    error: true,
+                    code: code.INVALID
+                }));
+            }
+        }
+        else{
+            socket.emit("/articles/get", Channel.message({
+                error: true,
+                code: code.INVALID
+            }));
+        }
+    })
 }
 
 module.exports = manage;

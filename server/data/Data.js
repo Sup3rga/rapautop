@@ -5,6 +5,7 @@ class Data{
     }
     async save(){}
     async delete(){}
+    async data(){}
     hydrate(data){
         return this;
     }
