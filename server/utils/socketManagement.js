@@ -48,7 +48,7 @@ async function saveCategory(sector, data, socket){
             message.push('[ID] ' + save[i].id + ' :: invalid');
         }
     }
-    socket.emit('/'+(sector === 'A' ? 'writing' : 'punchline')+'/category/get', Channel.message({
+    socket.emit('/'+(sector === 'A' ? 'writing' : 'punchlines')+'/category/get', Channel.message({
         error : false,
         code : code.SUCCESS,
         message: message,
@@ -131,8 +131,16 @@ function manage(socket){
     .on('/writing/category/set', async(data)=>{
         await saveCategory('A', data, socket);
     })
-    .on('/punchline/category/set', async (e) => {
+    .on('/punchlines/category/set', async (data) => {
+        console.log('[Data]',data);
         await saveCategory('P', data, socket);
+    })
+    .on('/punchlines/category/fetch', async(data)=>{
+        socket.emit("/punchlines/category/get", Channel.message({
+            error: false,
+            code: code.SUCCESS,
+            data: await Category.fetchAll(data.bhid, 'P')
+        }));
     })
     .on('/articles', async(data)=>{
         if(Filter.contains(data, [

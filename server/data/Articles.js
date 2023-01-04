@@ -263,7 +263,11 @@ class Articles extends Data{
             console.log('[After]',this.pictures, list);
             //Then we update the current Caption
             try {
-                await Pdo.prepare('update articles set caption=:p1').execute({p1: list.length ? list[0].id : null});
+                await Pdo.prepare('update articles set caption=:p1 where id=:p2')
+                    .execute({
+                        p1: list.length ? list[0].id : null,
+                        p2: article.id
+                    });
             } catch (e) {
                 Channel.logError(e);
             }
