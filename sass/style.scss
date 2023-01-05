@@ -472,6 +472,10 @@ $bottom-bar-height: 60px;
   .data{
     padding: .4em;
   }
+  .mask{
+    background-color: rgba(230,230,230,0.5);
+    @include backdrop-filter(blur(5px));
+  }
 }
 
 //@Override

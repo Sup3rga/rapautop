@@ -4,6 +4,8 @@ const code = require('../utils/ResponseCode'),
 const Filter = require("./Filter");
 const {is_array,isset} = require('./procedures');
 const AkaDatetime = require('./AkaDatetime');
+const fs = require('fs');
+const {promisify} = require('util');
 
 async function saveCategory(sector, data, socket){
     let message = [],
@@ -166,6 +168,21 @@ function manage(socket){
                 error: true,
                 code: code.INVALID
             }));
+        }
+    })
+    .on('/logo/fetch', async(data)=>{
+        // console.log('[logo]',data);
+        try {
+            const data = await promisify(fs.readFile)('../public/assets/white-logo.jpg');
+            // console.log('[logo...]',data);
+            socket.emit('/logo/get', Channel.message({
+                error: false,
+                data
+            }))
+        }catch(e){
+            socket.emit('/logo/get', Channel.logError(e).message({
+                code: code.SUCCESS
+            }))
         }
     })
 }
