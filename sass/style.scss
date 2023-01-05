@@ -438,6 +438,42 @@ $bottom-bar-height: 60px;
   }
 }
 
+.studio{
+  padding: .4em;
+  padding-bottom: 60px;
+  .header{
+    padding: .4em;
+    label{
+      font-family: Poppins-SemiBold;
+      font-size: 1.4em;
+      padding: 0 .4em;
+    }
+    .actions{
+      padding: 0 .4em;
+    }
+  }
+  .wrapper{
+    padding: 0 .2em;
+  }
+  .render{
+    padding: .3em;
+    overflow-x: hidden;
+    background-color: #efefef;
+    canvas{
+      background-color: #fff;
+    }
+    button{
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-transform: capitalize;
+    }
+  }
+  .data{
+    padding: .4em;
+  }
+}
+
 //@Override
 .MuiFab-root{
   background-color: $theme !important;
@@ -461,5 +497,8 @@ $bottom-bar-height: 60px;
     .view-wrapper{
       width: calc(100% - #{$sidemenu-width});
     }
+  }
+  .studio{
+    padding-bottom: .4em;
   }
 }

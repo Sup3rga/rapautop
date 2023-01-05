@@ -566,28 +566,78 @@
   text-transform: capitalize;
 }
 
-/* line 442, ../../sass/style.scss */
+/* line 441, ../../sass/style.scss */
+.studio {
+  padding: .4em;
+  padding-bottom: 60px;
+}
+/* line 444, ../../sass/style.scss */
+.studio .header {
+  padding: .4em;
+}
+/* line 446, ../../sass/style.scss */
+.studio .header label {
+  font-family: Poppins-SemiBold;
+  font-size: 1.4em;
+  padding: 0 .4em;
+}
+/* line 451, ../../sass/style.scss */
+.studio .header .actions {
+  padding: 0 .4em;
+}
+/* line 455, ../../sass/style.scss */
+.studio .wrapper {
+  padding: 0 .2em;
+}
+/* line 458, ../../sass/style.scss */
+.studio .render {
+  padding: .3em;
+  overflow-x: hidden;
+  background-color: #efefef;
+}
+/* line 462, ../../sass/style.scss */
+.studio .render canvas {
+  background-color: #fff;
+}
+/* line 465, ../../sass/style.scss */
+.studio .render button {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: capitalize;
+}
+/* line 472, ../../sass/style.scss */
+.studio .data {
+  padding: .4em;
+}
+
+/* line 478, ../../sass/style.scss */
 .MuiFab-root {
   background-color: #12172d !important;
 }
-/* line 444, ../../sass/style.scss */
+/* line 480, ../../sass/style.scss */
 .MuiFab-root icon {
   color: white;
 }
 
-/* line 449, ../../sass/style.scss */
+/* line 485, ../../sass/style.scss */
 .css-sghohy-MuiButtonBase-root-MuiButton-root, .css-sghohy-MuiButtonBase-root-MuiButton-root.Mui-focused {
   background-color: #12172d;
   color: white;
 }
 
 @media (min-width: 768px) {
-  /* line 458, ../../sass/style.scss */
+  /* line 494, ../../sass/style.scss */
   #main-panel .sidemenu {
     width: 80px;
   }
-  /* line 461, ../../sass/style.scss */
+  /* line 497, ../../sass/style.scss */
   #main-panel .view-wrapper {
     width: calc(100% - 80px);
+  }
+
+  /* line 501, ../../sass/style.scss */
+  .studio {
+    padding-bottom: .4em;
   }
 }
