@@ -487,9 +487,22 @@ $bottom-bar-height: 60px;
     @include backdrop-filter(blur(5px));
   }
 }
+
 .studio-config{
   .wrapper{
     padding: .4em .2em;
+  }
+}
+
+.upload-info{
+  .wrapping{
+    padding: .2em;
+    .wrapping{
+      padding: .2em .4em;
+    }
+  }
+  .process-text{
+    font-size: .8em;
   }
 }
 

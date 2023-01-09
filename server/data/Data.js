@@ -11,7 +11,7 @@ class Data{
     }
     static async getById(){}
     static async getLast(){}
-    static async fetchAll(){}
+    static async fetchAll(branch = 0, onlyData = true, _public = false){}
 }
 
 module.exports = Data;

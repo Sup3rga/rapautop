@@ -32,7 +32,11 @@ class Pictures extends Data{
         }catch (e){
             Channel.message({code: code.INTERNAL});
         }
-        return Channel.message({error: false, code: code.SUCCESS});
+        return Channel.message({
+            error: false,
+            code: code.SUCCESS,
+            data: await Pictures.getLast(this)
+        });
     }
 
     async delete(){
@@ -44,8 +48,8 @@ class Pictures extends Data{
         }catch(e){
             return Channel.message({code: code.INTERNAL});
         }
-        if(await is_file(this.path)){
-            await unlink(this.path);
+        if(await is_file(DIR.PUBLIC+this.path)){
+            await unlink(DIR.PUBLIC+this.path);
         }
         return Channel.message({code: code.SUCCESS});
     }

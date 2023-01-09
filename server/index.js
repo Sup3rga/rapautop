@@ -1,3 +1,8 @@
+const fs = require("fs");
+global.DIR = {
+    ROOT: fs.realpathSync('../'),
+    PUBLIC : fs.realpathSync('../public')
+};
 let express = require('express'),
     cors = require('cors'),
     server = express(),
@@ -9,7 +14,6 @@ let express = require('express'),
     ThunderSpeed = require('./utils/thunderspeed.server'),
     manage = require('./utils/socketManagement'),
     Filter = require('./utils/Filter');
-const fs = require("fs");
 
 const PORT = /*process.env.PORT ||*/ 7070;
 
@@ -56,8 +60,8 @@ server
     } = req.body,
         image = '';
     for(let i in upl_artimg){
-        if(ths.isUploaded(upl_artimg[i])){
-            if(ths.isUploaded(upl_artimg[i])) {
+        if(await ths.isUploaded(upl_artimg[i])){
+            if(await ths.isUploaded(upl_artimg[i])) {
                 const dest = await Pictures.nextName('A') + '.' + Pictures.extension(upl_artimg[i]);
                 image = '/assets/captions/' + dest;
                 await ths.move(upl_artimg[i], '../public/assets/captions/', dest);
@@ -68,7 +72,7 @@ server
         image = [];
     }
     for(let i in pch_img){
-        if(ths.isUploaded(pch_img[i])){
+        if(await ths.isUploaded(pch_img[i])){
             const dest = await Pictures.nextName('P') + '.' + Pictures.extension(pch_img[i]);
             image.push('/assets/captions/'+dest);
             await ths.move(pch_img[i], '../public/assets/captions/', dest);

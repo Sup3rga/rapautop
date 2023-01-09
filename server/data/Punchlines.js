@@ -65,10 +65,19 @@ class Punchlines extends TracableData{
         return this;
     }
 
+    async savePicture(path){
+        const picture = new Pictures();
+        picture.path = path;
+        picture.createdBy = this[this.id ? 'modifiedBy' : 'createdBy'];
+        picture.createdAt = this[this.id ? 'modifiedBy' : 'createdBy'];
+        return await picture.save();
+    }
+
     async save(){
+        let _code = code.SUCCESS;
         if(!Filter.contains(this, [
             'title', 'picture','card','punchline', 'year','artist', 'punchline',
-            'createdBy', 'createdAt'
+            'createdBy', 'createdAt', 'postOn'
         ], [null,0,'']) ||
             (
                 this.id && !Filter.contains(this, [
@@ -79,6 +88,39 @@ class Punchlines extends TracableData{
             return Channel.message({code: code.INVALID});
         }
         try {
+            let _self, old, saving,
+                updatable = this.id && [typeof this.picture, typeof  this.card].indexOf('string') >= 0;
+            if(updatable) {
+                _self = await Punchlines.getById(this.id);
+            }
+            const _job = async (index)=>{
+                if(typeof this[index] === 'string'){
+                    saving = await this.savePicture(this[index]);
+                    if(updatable) {
+                        old = await Pictures.getById(_self[index]);
+                    }
+                    if(!saving.error) {
+                        if(updatable) {
+                            await old.delete();
+                        }
+                        this[index] = saving.data.id;
+                    }
+                    else{
+                        _code = code.PICTURE_UPDATE_ERROR;
+                        if(updatable) {
+                            this[index] = old.id;
+                        }
+                        else{
+                            return Channel.message({code: _code})
+                        }
+                    }
+                }
+            }
+
+            let task;
+            if(task = await _job('picture')) return task;
+            if(task = await _job('card')) return task;
+
             const base = {
                 p1: this.picture,
                 p2: this.card,
@@ -121,7 +163,7 @@ class Punchlines extends TracableData{
         }
         return Channel.message({
             error: false,
-            code : code.SUCCESS
+            code : _code
         });
     }
 
@@ -137,4 +179,21 @@ class Punchlines extends TracableData{
         }
         return punchline;
     }
+
+    static async fetchAll(branch = 0, dataOnly = true, _public = false){
+        const r = [];
+        try{
+            const results = await Pdo.prepare("select * from punchlines where branch=:branch")
+                .execute({branch});
+            let data;
+            while(data = results.fetch()){
+                r.push(await new Punchlines().hydrate(data).data(_public));
+            }
+        }catch (e){
+            Channel.logError(e);
+        }
+        return r;
+    }
 }
+
+module.exports = Punchlines;

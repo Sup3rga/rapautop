@@ -230,9 +230,9 @@ class ThunderSpeed{
         return r;
     }
 
-    isUploaded(filename = null){
+    async isUploaded(filename = null){
         ThunderSpeed.uploadDir = this.conformToDir(ThunderSpeed.uploadDir);
-        return filename != null && is_file(ThunderSpeed.uploadDir + filename);
+        return  filename !== null && await is_file(ThunderSpeed.uploadDir + filename);
     }
 }
 

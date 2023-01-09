@@ -1,4 +1,4 @@
-let {Articles,Category} = require('../data/dataPackage');
+let {Articles,Category,Punchlines} = require('../data/dataPackage');
 const code = require('../utils/ResponseCode'),
       Channel = require('../utils/Channel');
 const Filter = require("./Filter");
@@ -187,8 +187,56 @@ function manage(socket){
         }));
     })
     .on('/punchlines/create', async(data)=>{
-
-    })
+        console.log('[Data]',data);
+        if(!Filter.contains(data, [
+            'cmid', 'bhid','cmtk',
+            'title','year','artist', 'category',
+            'punchline', 'res'
+        ], [null,0,''])){
+            return socket.emit(Channel.message({code: code.INVALID}))
+        }
+        const update = 'id' in data;
+        const punchline = update ? await Punchlines.getById(data.id) : new Punchlines();
+        if(!punchline || !is_array(data.res) || (!update && data.res.length < 2)){
+            return socket.emit('/punchlines/get',Channel.message({code: code.INVALID}));
+        }
+        punchline.title = data.title;
+        punchline.artist = data.artist;
+        punchline.category = data.category;
+        punchline.year = data.year;
+        punchline.punchline = data.punchline;
+        punchline.lyrics = data.lyrics ? data.lyrics : null;
+        punchline.comment = data.comment ? data.comment : null;
+        if(data.res.length){
+            punchline.card = data.res[0];
+            if(data.res[1]){
+                punchline.picture = data.res[1];
+            }
+        }
+        punchline[update ? 'modifiedBy' : 'createdBy'] = data.cmid;
+        punchline[update ? 'modifiedAt' : 'createdAt'] = new AkaDatetime().getDateTime();
+        if(!update){
+            punchline.branch = data.bhid;
+        }
+        if(data.schdate && AkaDatetime.isDateTime(data.schdate) &&
+            (
+                !update || (update && new AkaDatetime().isLessThan(new AkaDatetime()))
+            )
+        ){
+            punchline.postOn = data.schdate;
+        }
+        else if(!update){
+            punchline.postOn = new AkaDatetime().getDateTime();
+        }
+        const saving = await punchline.save();
+        if(saving.error){
+            return socket.emit('/punchlines/get',saving);
+        }
+        socket.emit('/punchlines/get',Channel.message({
+            ...saving,
+            data: await Punchlines.fetchAll(data.bhid)
+        }));
+    });
 }
 
 module.exports = manage;
