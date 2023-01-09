@@ -453,7 +453,7 @@ $bottom-bar-height: 60px;
     }
   }
   .wrapper{
-    padding: 0 .2em;
+    padding: .4em .2em;
   }
   .render{
     padding: .3em;
@@ -462,11 +462,21 @@ $bottom-bar-height: 60px;
     canvas{
       background-color: #fff;
     }
+    .image-preview{
+      width: 50px;
+      height: 50px;
+      background-color: #eee;
+      color: #777;
+      border: 1px solid #ccc;
+      border-radius: .5em;
+      margin-right: .5em;
+    }
     button{
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       text-transform: capitalize;
+      margin: 0 .2em;
     }
   }
   .data{
@@ -475,6 +485,11 @@ $bottom-bar-height: 60px;
   .mask{
     background-color: rgba(230,230,230,0.5);
     @include backdrop-filter(blur(5px));
+  }
+}
+.studio-config{
+  .wrapper{
+    padding: .4em .2em;
   }
 }
 

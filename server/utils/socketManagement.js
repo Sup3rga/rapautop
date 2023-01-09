@@ -63,7 +63,7 @@ function manage(socket){
     socket.on("disconnecting", ()=>{
         console.log('disconnected');
     })
-    socket.on('/writing/write', async (data)=>{
+    .on('/writing/write', async (data)=>{
         // console.log('[Article]',data);
         if(Filter.contains(data, [
             'title','content', 'img','cmid','bhid','cmtk', 'category',
@@ -98,6 +98,7 @@ function manage(socket){
                 isset(data.schdate) && AkaDatetime.isDateTime(data.schdate) &&
                 !article.published
             ){
+                console.log('[Set Date]',data.schdate);
                 article.postOn = data.schdate;
             }
             else if(!update){
@@ -132,17 +133,6 @@ function manage(socket){
     })
     .on('/writing/category/set', async(data)=>{
         await saveCategory('A', data, socket);
-    })
-    .on('/punchlines/category/set', async (data) => {
-        console.log('[Data]',data);
-        await saveCategory('P', data, socket);
-    })
-    .on('/punchlines/category/fetch', async(data)=>{
-        socket.emit("/punchlines/category/get", Channel.message({
-            error: false,
-            code: code.SUCCESS,
-            data: await Category.fetchAll(data.bhid, 'P')
-        }));
     })
     .on('/articles', async(data)=>{
         if(Filter.contains(data, [
@@ -184,6 +174,20 @@ function manage(socket){
                 code: code.SUCCESS
             }))
         }
+    })
+    .on('/punchlines/category/set', async (data) => {
+        console.log('[Data]',data);
+        await saveCategory('P', data, socket);
+    })
+    .on('/punchlines/category/fetch', async(data)=>{
+        socket.emit("/punchlines/category/get", Channel.message({
+            error: false,
+            code: code.SUCCESS,
+            data: await Category.fetchAll(data.bhid, 'P')
+        }));
+    })
+    .on('/punchlines/create', async(data)=>{
+
     })
 }
 

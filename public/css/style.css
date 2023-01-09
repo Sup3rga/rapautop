@@ -587,7 +587,7 @@
 }
 /* line 455, ../../sass/style.scss */
 .studio .wrapper {
-  padding: 0 .2em;
+  padding: .4em .2em;
 }
 /* line 458, ../../sass/style.scss */
 .studio .render {
@@ -600,17 +600,28 @@
   background-color: #fff;
 }
 /* line 465, ../../sass/style.scss */
+.studio .render .image-preview {
+  width: 50px;
+  height: 50px;
+  background-color: #eee;
+  color: #777;
+  border: 1px solid #ccc;
+  border-radius: .5em;
+  margin-right: .5em;
+}
+/* line 474, ../../sass/style.scss */
 .studio .render button {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   text-transform: capitalize;
+  margin: 0 .2em;
 }
-/* line 472, ../../sass/style.scss */
+/* line 482, ../../sass/style.scss */
 .studio .data {
   padding: .4em;
 }
-/* line 475, ../../sass/style.scss */
+/* line 485, ../../sass/style.scss */
 .studio .mask {
   background-color: rgba(230, 230, 230, 0.5);
   backdrop-filter: blur(5px);
@@ -620,32 +631,37 @@
   -webkit-backdrop-filter: blur(5px);
 }
 
-/* line 482, ../../sass/style.scss */
+/* line 491, ../../sass/style.scss */
+.studio-config .wrapper {
+  padding: .4em .2em;
+}
+
+/* line 497, ../../sass/style.scss */
 .MuiFab-root {
   background-color: #12172d !important;
 }
-/* line 484, ../../sass/style.scss */
+/* line 499, ../../sass/style.scss */
 .MuiFab-root icon {
   color: white;
 }
 
-/* line 489, ../../sass/style.scss */
+/* line 504, ../../sass/style.scss */
 .css-sghohy-MuiButtonBase-root-MuiButton-root, .css-sghohy-MuiButtonBase-root-MuiButton-root.Mui-focused {
   background-color: #12172d;
   color: white;
 }
 
 @media (min-width: 768px) {
-  /* line 498, ../../sass/style.scss */
+  /* line 513, ../../sass/style.scss */
   #main-panel .sidemenu {
     width: 80px;
   }
-  /* line 501, ../../sass/style.scss */
+  /* line 516, ../../sass/style.scss */
   #main-panel .view-wrapper {
     width: calc(100% - 80px);
   }
 
-  /* line 505, ../../sass/style.scss */
+  /* line 520, ../../sass/style.scss */
   .studio {
     padding-bottom: .4em;
   }

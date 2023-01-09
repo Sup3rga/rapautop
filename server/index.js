@@ -33,7 +33,7 @@ let requestConfig = {
 server.use(cors())
 server.use(bodyParser.json(requestConfig))
 server.use(bodyParser.raw(requestConfig))
-server.use(ths.watch(['artimg']))
+server.use(ths.watch(['artimg','upl_pch']))
 
 io.on("connection", (socket)=>{
     manage(socket);
@@ -50,13 +50,28 @@ server
 })
 .post('/upl_img', async (req, res)=>{
     // console.log('[Body]',req.body);
-    let {upl_artimg} = Filter.object(req.body, ['upl_artimg']),
+    let {
+        upl_artimg = [],
+        pch_img = []
+    } = req.body,
         image = '';
     for(let i in upl_artimg){
         if(ths.isUploaded(upl_artimg[i])){
-            const dest = await Pictures.nextName('A') + '.' + Pictures.extension(upl_artimg[i]);
-            image = '/assets/captions/'+dest;
-            await ths.move(upl_artimg[i], '../public/assets/captions/', dest);
+            if(ths.isUploaded(upl_artimg[i])) {
+                const dest = await Pictures.nextName('A') + '.' + Pictures.extension(upl_artimg[i]);
+                image = '/assets/captions/' + dest;
+                await ths.move(upl_artimg[i], '../public/assets/captions/', dest);
+            }
+        }
+    }
+    if(pch_img.length){
+        image = [];
+    }
+    for(let i in pch_img){
+        if(ths.isUploaded(pch_img[i])){
+            const dest = await Pictures.nextName('P') + '.' + Pictures.extension(pch_img[i]);
+            image.push('/assets/captions/'+dest);
+            await ths.move(pch_img[i], '../public/assets/captions/', dest);
         }
     }
     res.json({
