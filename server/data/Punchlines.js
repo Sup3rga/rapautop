@@ -5,6 +5,9 @@ const Category = require("./Category");
 const code = require("../utils/ResponseCode");
 const Channel = require("../utils/Channel");
 const {Pdo} = require("../utils/Connect");
+const {in_array} = require("../utils/procedures");
+const AkaDatetime = require("../utils/AkaDatetime");
+const Manager = require("./Manager");
 
 class Punchlines extends TracableData{
 
@@ -25,7 +28,7 @@ class Punchlines extends TracableData{
 
     async data(_public = true){
         const data = Filter.object(this, [
-            'id', 'picture', 'card', 'year', 'artist', 'lyrics', 'punchline',
+            'id','title', 'picture', 'card', 'year', 'artist', 'lyrics', 'punchline',
             'category', 'comment', 'postOn',
             'createdBy','createdAt','modifiedAt','modifiedBy', 'branch',
         ]);
@@ -49,8 +52,8 @@ class Punchlines extends TracableData{
     hydrate(data) {
         this.id = data.id;
         this.title = data.title;
-        this.picture = data.picture;
-        this.card = data.presentation;
+        this.picture = data.presentation;
+        this.card = data.picture;
         this.punchline = data.punchline;
         this.year = data.year;
         this.lyrics = data.lyrics;
@@ -193,6 +196,40 @@ class Punchlines extends TracableData{
             Channel.logError(e);
         }
         return r;
+    }
+
+    static async fetchYears(branch){
+        const list = [];
+        try{
+            const request = await Pdo.prepare("select year from punchlines where branch=:branch")
+                .execute({branch});
+            let data;
+            while(data = request.fetch()){
+                if(!in_array(list, data.year, true)){
+                    list.push(data.year);
+                }
+            }
+        }catch (e){
+            Channel.logError(e);
+        }
+        return list;
+    }
+
+    static async fetchArtists(branch){
+        const list = [];
+        try{
+            const request = await Pdo.prepare("select artist from punchlines where branch=:branch")
+                .execute({branch});
+            let data;
+            while(data = request.fetch()){
+                if(!in_array(list, data.artist, true)){
+                    list.push(data.artist);
+                }
+            }
+        }catch (e){
+            Channel.logError(e);
+        }
+        return list;
     }
 }
 

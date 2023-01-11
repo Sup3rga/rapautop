@@ -234,7 +234,27 @@ function manage(socket){
         }
         socket.emit('/punchlines/get',Channel.message({
             ...saving,
-            data: await Punchlines.fetchAll(data.bhid)
+            data: {
+                punchlines: await Punchlines.fetchAll(data.bhid),
+                years: await Punchlines.fetchYears(data.bhid),
+                artists: await Punchlines.fetchArtists(data.bhid)
+            }
+        }));
+    })
+    .on('/punchlines/fetch', async (data)=>{
+        if(!Filter.contains(data, [
+            'cmid', 'bhid','cmtk',
+        ], [null,0,''])){
+            return socket.emit(Channel.message({code: code.INVALID}))
+        }
+        socket.emit('/punchlines/get',Channel.message({
+            error: false,
+            code : code.SUCCESS,
+            data: {
+                punchlines: await Punchlines.fetchAll(data.bhid),
+                years: await Punchlines.fetchYears(data.bhid),
+                artists: await Punchlines.fetchArtists(data.bhid)
+            }
         }));
     });
 }

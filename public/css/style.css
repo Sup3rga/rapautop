@@ -637,44 +637,56 @@
 }
 
 /* line 498, ../../sass/style.scss */
+.studio-grid .punchline {
+  padding: .3em;
+}
+/* line 500, ../../sass/style.scss */
+.studio-grid .punchline img {
+  height: 25vmin;
+  border: 1px solid #ccc;
+  background-color: #eee;
+  border-radius: .4em;
+}
+
+/* line 510, ../../sass/style.scss */
 .upload-info .wrapping {
   padding: .2em;
 }
-/* line 500, ../../sass/style.scss */
+/* line 512, ../../sass/style.scss */
 .upload-info .wrapping .wrapping {
   padding: .2em .4em;
 }
-/* line 504, ../../sass/style.scss */
+/* line 516, ../../sass/style.scss */
 .upload-info .process-text {
   font-size: .8em;
 }
 
-/* line 510, ../../sass/style.scss */
+/* line 522, ../../sass/style.scss */
 .MuiFab-root {
   background-color: #12172d !important;
 }
-/* line 512, ../../sass/style.scss */
+/* line 524, ../../sass/style.scss */
 .MuiFab-root icon {
   color: white;
 }
 
-/* line 517, ../../sass/style.scss */
+/* line 529, ../../sass/style.scss */
 .css-sghohy-MuiButtonBase-root-MuiButton-root, .css-sghohy-MuiButtonBase-root-MuiButton-root.Mui-focused {
   background-color: #12172d;
   color: white;
 }
 
 @media (min-width: 768px) {
-  /* line 526, ../../sass/style.scss */
+  /* line 538, ../../sass/style.scss */
   #main-panel .sidemenu {
     width: 80px;
   }
-  /* line 529, ../../sass/style.scss */
+  /* line 541, ../../sass/style.scss */
   #main-panel .view-wrapper {
     width: calc(100% - 80px);
   }
 
-  /* line 533, ../../sass/style.scss */
+  /* line 545, ../../sass/style.scss */
   .studio {
     padding-bottom: .4em;
   }

@@ -54,8 +54,20 @@ async function unlink(filename){
     }
 }
 
+function in_array(list = [], element, ignoreCase = false){
+    if(!ignoreCase){
+        return list.indexOf(element) >= 0;
+    }
+    for(let i in list){
+        if(list[i].toString().toLowerCase() === element.toString().toLowerCase()){
+            return true;
+        }
+    }
+    return false;
+}
+
 module.exports = {
     isset,empty,time,is_array,base64_decode,
     is_file,rename,unlink,buffer_base64,
-    filter
+    filter,in_array
 };

@@ -494,6 +494,18 @@ $bottom-bar-height: 60px;
   }
 }
 
+.studio-grid{
+  .punchline{
+    padding: .3em;
+    img{
+      height: 25vmin;
+      border: 1px solid #ccc;
+      background-color: #eee;
+      border-radius: .4em;
+    }
+  }
+}
+
 .upload-info{
   .wrapping{
     padding: .2em;
