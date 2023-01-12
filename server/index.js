@@ -12,7 +12,7 @@ let express = require('express'),
     bodyParser = require('body-parser'),
     {Manager, Pictures, Articles} = require('./data/dataPackage'),
     ThunderSpeed = require('./utils/thunderspeed.server'),
-    manage = require('./utils/socketManagement'),
+    manage = require('./controller/socketManagement'),
     Filter = require('./utils/Filter');
 
 const PORT = /*process.env.PORT ||*/ 7070;
@@ -25,7 +25,7 @@ const io = new Server(httpServer, {
 });
 
 const ths = new ThunderSpeed();
-
+ths.setResumable(true);
 ThunderSpeed.uploadDir = fs.realpathSync('./ths_tmp');
 ThunderSpeed.baseDir = fs.realpathSync('./');
 

@@ -15,8 +15,8 @@ class Punchlines extends TracableData{
         super();
         this.id = 0;
         this.title = null;
-        this.picture = 0;
-        this.card = 0;
+        this.picture = 0; //base picture as punchline card background
+        this.card = 0; //punchline card
         this.year = 0;
         this.artist = null;
         this.lyrics = null;
@@ -65,6 +65,7 @@ class Punchlines extends TracableData{
         this.createdAt = new AkaDatetime(data.created_at).getDateTime();
         this.modifiedBy = data.modified_by;
         this.modifiedAt = new AkaDatetime(data.modified_at).getDateTime();
+        this.postOn = new AkaDatetime(data.post_on).getDateTime();
         return this;
     }
 
@@ -90,6 +91,7 @@ class Punchlines extends TracableData{
         ){
             return Channel.message({code: code.INVALID});
         }
+        const _delpictures = [];
         try {
             let _self, old, saving,
                 updatable = this.id && [typeof this.picture, typeof  this.card].indexOf('string') >= 0;
@@ -97,32 +99,36 @@ class Punchlines extends TracableData{
                 _self = await Punchlines.getById(this.id);
             }
             const _job = async (index)=>{
-                if(typeof this[index] === 'string'){
+                saving = null;
+                if(typeof this[index] === 'string') {
                     saving = await this.savePicture(this[index]);
-                    if(updatable) {
+                    if (updatable) {
                         old = await Pictures.getById(_self[index]);
+                        _delpictures.push(old);
                     }
-                    if(!saving.error) {
-                        if(updatable) {
-                            await old.delete();
+                    if (!saving.error) {
+                        if (!saving.data) {
+                            _code = code.PICTURE_UPDATE_ERROR;
+                            return Channel.message({code: _code})
                         }
                         this[index] = saving.data.id;
-                    }
-                    else{
+                    } else {
                         _code = code.PICTURE_UPDATE_ERROR;
-                        if(updatable) {
+                        if (updatable) {
+                            _delpictures.pop();
                             this[index] = old.id;
-                        }
-                        else{
+                        } else {
                             return Channel.message({code: _code})
                         }
                     }
                 }
             }
-
+            if(this.id && /^[0-9]+$/.test(this.picture)){
+                this.picture = null;
+            }
             let task;
-            if(task = await _job('picture')) return task;
             if(task = await _job('card')) return task;
+            if (task = await _job('picture')) return task;
 
             const base = {
                 p1: this.picture,
@@ -148,9 +154,12 @@ class Punchlines extends TracableData{
                     p13: this.branch
                 });
             }else{
+                if(!base.p1){
+                    delete base.p1;
+                }
                 await Pdo.prepare(`
-                    update punchlines set
-                        presentation=:p2, picture = :p1, title = :p3, artist = :p4,
+                    update punchlines set `+(this.picture ? 'presentation = :p1,' : '')+`
+                        picture=:p2, title = :p3, artist = :p4,
                         lyrics=:p5, punchline=:p6, year=:p7, category=:p8, comment=:p9,
                         modified_at=:p10, modified_by=:p11, post_on=:p12
                     where id = :p13
@@ -164,6 +173,9 @@ class Punchlines extends TracableData{
         }catch (e){
             return Channel.logError(e).message({code: code.INTERNAL});
         }
+        for(let i in _delpictures){
+            await _delpictures[i].delete();
+        }
         return Channel.message({
             error: false,
             code : _code
@@ -173,7 +185,7 @@ class Punchlines extends TracableData{
     static async getById(id){
         let punchline = null;
         try{
-            const request = await Pdo.prepare("select * from punchlines where id=:p1").execute({id});
+            const request = await Pdo.prepare("select * from punchlines where id=:id").execute({id});
             if(request.rowCount){
                 punchline = new Punchlines().hydrate(request.fetch());
             }

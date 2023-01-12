@@ -53,8 +53,9 @@ class ThunderSpeed{
     }
 
     isExpired(timestamp){
-        let r = false;
-        return this.resumable ? false : new Date().getTime() - timestamp > 60 * 5;
+        const currentTimestamp = new Date().getTime();
+        timestamp *= 1;
+        return this.resumable ? false : currentTimestamp - timestamp > 60 * 5;
     }
 
     // async convert(){

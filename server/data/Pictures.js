@@ -44,9 +44,9 @@ class Pictures extends Data{
             Channel.message({code: code.INVALID});
         }
         try{
-            await Pdo.prepare("delete from pictures where id=:p1").execute({id});
+            await Pdo.prepare("delete from pictures where id=:id").execute({id: this.id});
         }catch(e){
-            return Channel.message({code: code.INTERNAL});
+            return Channel.logError(e).message({code: code.INTERNAL});
         }
         if(await is_file(DIR.PUBLIC+this.path)){
             await unlink(DIR.PUBLIC+this.path);
