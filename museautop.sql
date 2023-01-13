@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Dec 07, 2022 at 03:12 AM
+-- Generation Time: Jan 13, 2023 at 05:42 AM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 7.4.29
 
@@ -29,7 +29,8 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `articles` (
   `id` int(11) NOT NULL,
-  `caption` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `caption` int(11) DEFAULT NULL,
   `content` text NOT NULL,
   `created_at` datetime NOT NULL,
   `created_by` int(11) NOT NULL,
@@ -41,6 +42,18 @@ CREATE TABLE `articles` (
   `category` int(11) NOT NULL,
   `branch` int(11) NOT NULL,
   `post_on` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `articles_pictures`
+--
+
+CREATE TABLE `articles_pictures` (
+  `id` int(11) NOT NULL,
+  `img` int(11) NOT NULL,
+  `article` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -145,7 +158,7 @@ CREATE TABLE `messenging` (
   `client` int(11) NOT NULL,
   `message` text NOT NULL,
   `post_on` datetime NOT NULL,
-  `read_by` int(11) NOT NULL
+  `read_by` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -158,9 +171,7 @@ CREATE TABLE `pictures` (
   `id` int(11) NOT NULL,
   `path` text NOT NULL,
   `created_at` datetime NOT NULL,
-  `created_by` int(11) NOT NULL,
-  `modified_at` datetime NOT NULL,
-  `modified_by` int(11) NOT NULL
+  `created_by` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -191,16 +202,40 @@ CREATE TABLE `punchlines` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `session_trace`
+--
+
+CREATE TABLE `session_trace` (
+  `client` int(11) NOT NULL,
+  `token` text NOT NULL,
+  `created_at` datetime NOT NULL,
+  `last_seen` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `subscriber`
 --
 
 CREATE TABLE `subscriber` (
   `id` int(11) NOT NULL,
   `mail` varchar(255) NOT NULL,
-  `contact` set('0','1') NOT NULL,
-  `news` enum('0','1') NOT NULL,
+  `contact` int(11) NOT NULL,
+  `news` int(11) NOT NULL,
   `created_at` datetime NOT NULL,
   `branch` int(11) NOT NULL
+) ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sys_pref`
+--
+
+CREATE TABLE `sys_pref` (
+  `metadata` varchar(255) NOT NULL,
+  `content` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -215,8 +250,16 @@ ALTER TABLE `articles`
   ADD KEY `fk_pic_caption` (`caption`),
   ADD KEY `fk_man_creator` (`created_by`),
   ADD KEY `fk_man_editor` (`modified_by`),
-  ADD KEY `fk_branch_art` (`branch`),
-  ADD KEY `fk_cat_art` (`category`);
+  ADD KEY `fk_cat_art` (`category`),
+  ADD KEY `fk_branch_art` (`branch`);
+
+--
+-- Indexes for table `articles_pictures`
+--
+ALTER TABLE `articles_pictures`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_art_img` (`img`),
+  ADD KEY `fk_art_id` (`article`);
 
 --
 -- Indexes for table `branch`
@@ -275,8 +318,7 @@ ALTER TABLE `messenging`
 --
 ALTER TABLE `pictures`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_man_pic_creator` (`created_by`),
-  ADD KEY `fk_man_pic_editor` (`modified_by`);
+  ADD KEY `fk_man_pic_creator` (`created_by`);
 
 --
 -- Indexes for table `punchlines`
@@ -289,6 +331,12 @@ ALTER TABLE `punchlines`
   ADD KEY `fk_man_punch_creator` (`created_by`),
   ADD KEY `fk_man_punch_editor` (`modified_by`),
   ADD KEY `fk_branch_punch` (`branch`);
+
+--
+-- Indexes for table `session_trace`
+--
+ALTER TABLE `session_trace`
+  ADD KEY `fk_man_session` (`client`);
 
 --
 -- Indexes for table `subscriber`
@@ -305,6 +353,12 @@ ALTER TABLE `subscriber`
 -- AUTO_INCREMENT for table `articles`
 --
 ALTER TABLE `articles`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `articles_pictures`
+--
+ALTER TABLE `articles_pictures`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -376,10 +430,17 @@ ALTER TABLE `subscriber`
 --
 ALTER TABLE `articles`
   ADD CONSTRAINT `fk_branch_art` FOREIGN KEY (`branch`) REFERENCES `branch` (`id`),
-  ADD CONSTRAINT `fk_cat_art` FOREIGN KEY (`category`) REFERENCES `branch` (`id`),
+  ADD CONSTRAINT `fk_cat_art` FOREIGN KEY (`category`) REFERENCES `category` (`id`),
   ADD CONSTRAINT `fk_man_creator` FOREIGN KEY (`created_by`) REFERENCES `manager` (`id`),
   ADD CONSTRAINT `fk_man_editor` FOREIGN KEY (`modified_by`) REFERENCES `manager` (`id`),
   ADD CONSTRAINT `fk_pic_caption` FOREIGN KEY (`caption`) REFERENCES `pictures` (`id`);
+
+--
+-- Constraints for table `articles_pictures`
+--
+ALTER TABLE `articles_pictures`
+  ADD CONSTRAINT `fk_art_id` FOREIGN KEY (`article`) REFERENCES `articles` (`id`),
+  ADD CONSTRAINT `fk_art_img` FOREIGN KEY (`img`) REFERENCES `pictures` (`id`);
 
 --
 -- Constraints for table `category`
@@ -420,8 +481,7 @@ ALTER TABLE `messenging`
 -- Constraints for table `pictures`
 --
 ALTER TABLE `pictures`
-  ADD CONSTRAINT `fk_man_pic_creator` FOREIGN KEY (`created_by`) REFERENCES `manager` (`id`),
-  ADD CONSTRAINT `fk_man_pic_editor` FOREIGN KEY (`modified_by`) REFERENCES `manager` (`id`);
+  ADD CONSTRAINT `fk_man_pic_creator` FOREIGN KEY (`created_by`) REFERENCES `manager` (`id`);
 
 --
 -- Constraints for table `punchlines`
@@ -433,6 +493,12 @@ ALTER TABLE `punchlines`
   ADD CONSTRAINT `fk_final_pic` FOREIGN KEY (`picture`) REFERENCES `pictures` (`id`),
   ADD CONSTRAINT `fk_man_punch_creator` FOREIGN KEY (`created_by`) REFERENCES `manager` (`id`),
   ADD CONSTRAINT `fk_man_punch_editor` FOREIGN KEY (`modified_by`) REFERENCES `manager` (`id`);
+
+--
+-- Constraints for table `session_trace`
+--
+ALTER TABLE `session_trace`
+  ADD CONSTRAINT `fk_man_session` FOREIGN KEY (`client`) REFERENCES `manager` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `subscriber`
