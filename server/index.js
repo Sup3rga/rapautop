@@ -12,7 +12,7 @@ let express = require('express'),
     bodyParser = require('body-parser'),
     {Manager, Pictures, Articles} = require('./data/dataPackage'),
     ThunderSpeed = require('./utils/thunderspeed.server'),
-    manage = require('./controller/socketManagement'),
+    {manage,serve} = require('./controller/socketManagement'),
     Filter = require('./utils/Filter');
 
 const PORT = /*process.env.PORT ||*/ 7070;
@@ -44,14 +44,9 @@ io.on("connection", (socket)=>{
 });
 
 server
-.post('/connect', (req,res)=>{
-    let {identifier,code} = req.body;
-    Manager
-    .connect(identifier, code)
-    .then((result)=>{
-        res.json(result);
-    });
-})
+.post('/submit', (request,response)=> serve(request.body,response))
+.post('/fetch', (request,response)=> serve(request.body,response))
+.post('/connect', (request,response)=> serve(request.body,response))
 .post('/upl_img', async (req, res)=>{
     // console.log('[Body]',req.body);
     let {

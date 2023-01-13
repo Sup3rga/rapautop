@@ -107,7 +107,7 @@ class Messenging extends Data{
         return message;
     }
 
-    static async fetchAll(branch, onlyData, _public){
+    static async fetchAll(branch, onlyData = true, _public = false){
         const list = [];
         try{
             const request = await Pdo.prepare(`
@@ -115,8 +115,8 @@ class Messenging extends Data{
                     where s.branch = :branch
                 `).execute({branch});
             let data;
-            while(data = request){
-                data = new Messenging().hydrate(data)
+            while(data = request.fetch()){
+                data = new Messenging().hydrate(data);
                 list.push(onlyData ? await data.data(_public) : data);
             }
         }catch (e){

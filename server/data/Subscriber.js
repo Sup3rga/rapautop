@@ -59,6 +59,20 @@ class Subscriber extends Data{
         return this;
     }
 
+    static async getByEmail(email){
+        let subscriber = null;
+        try{
+            const request = await Pdo.prepare('select * from subscriber where mail=:email')
+                .execute({email});
+            if(request.rowCount){
+                subscriber = new Subscriber().hydrate(request.fetch());
+            }
+        }catch (e){
+            Channel.logError(e);
+        }
+        return subscriber;
+    }
+
     static async getById(id){
         let subscriber = null;
         try{

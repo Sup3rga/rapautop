@@ -518,6 +518,65 @@ $bottom-bar-height: 60px;
   }
 }
 
+.messages{
+  .header{
+    padding: .4em;
+    .sort-chip{
+      margin: 0 .2em;
+      &.icon icon{
+        font-size: 1.6em;
+        position: relative;
+        left: 6px;
+      }
+    }
+  }
+  .message-row{
+    padding: .4em;
+    padding-left: .8em;
+    text-decoration: none;
+    color: #000;
+    border-radius: .5em;
+    position: relative;
+    &.unread:before{
+      position: absolute;
+      content: '';
+      width: 5px;
+      height: 60%;
+      background-color: $theme;
+      left: .1em;
+      top: 20%;
+      border-radius: .8em;
+    }
+    .avatar{
+      border-radius: .7em;
+      background-color: $theme;
+    }
+    .data{
+      padding: .2em 0 .2em .5em;
+      .name{
+        padding: .2em 0;
+        font-family: Poppins-SemiBold;
+        font-size: 1.1em;
+      }
+      .date{
+        font-family: Roboto-Light;
+        font-size: .8em;
+      }
+      .message{
+        padding: .2em .2em 1em .2em;
+        font-size: .9em;
+        border-bottom: 1px solid #ccc;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+    &:hover{
+      background-color: #eee;
+    }
+  }
+}
+
 //@Override
 .MuiFab-root{
   background-color: $theme !important;

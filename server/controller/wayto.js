@@ -1,4 +1,7 @@
-let {Articles,Category,Punchlines} = require('../data/dataPackage');
+let {
+    Articles,Category,Punchlines,
+    Messenging, Manager, Subscriber
+} = require('../data/dataPackage');
 const code = require('../utils/ResponseCode'),
     Channel = require('../utils/Channel');
 const Filter = require("../utils/Filter");
@@ -6,8 +9,16 @@ const {is_array,isset,is_file,unlink} = require('../utils/procedures');
 const AkaDatetime = require('../utils/AkaDatetime');
 const fs = require('fs');
 const {promisify} = require('util');
+const defaultQuery = ['cmid', 'bhid','cmtk'];
 
 const Wayto = {};
+
+Wayto.connect = async (data)=>{
+    if(!Filter.contains(data, ['identifier', 'code'])){
+        return Channel.message({code: code.INVALID});
+    }
+    return await Manager.connect(data.identifier, data.code);
+}
 
 Wayto.getAllCategories = async (data, sector='A')=>{
     return Channel.message({
@@ -30,7 +41,7 @@ Wayto.getAllWritingData = async (data)=>{
 
 Wayto.getArticles = async (data)=>{
     if(Filter.contains(data, [
-        'artid','cmid','bhid','cmtk'
+        'artid', ...defaultQuery
     ])){
         return Channel.message({
             error: true,
@@ -67,9 +78,7 @@ Wayto.getLogo = async (data)=>{
 }
 
 Wayto.getPunchlines = async (data)=>{
-    if(!Filter.contains(data, [
-        'cmid', 'bhid','cmtk',
-    ], [null,0,''])){
+    if(!Filter.contains(data, defaultQuery, [null,0,''])){
         return Channel.message({code: code.INVALID});
     }
     return Channel.message({
@@ -81,6 +90,54 @@ Wayto.getPunchlines = async (data)=>{
             artists: await Punchlines.fetchArtists(data.bhid)
         }
     });
+}
+
+Wayto.receiveMessage = async (data)=>{
+    console.log('[Data]',data)
+    if(!Filter.contains(data, [
+        'cli_fname', 'cli_lname', 'cli_mail', 'cli_msg','cli_bhid'
+    ])){
+        return Channel.message({code: code.INVALID});
+    }
+    let client = await Subscriber.getByEmail(data.cli_mail),
+        saving;
+    if(!client){
+        client = new Subscriber();
+        client.mail = data.cli_mail;
+        client.contact = 1;
+        client.branch = data.cli_bhid;
+        client.createdAt = AkaDatetime.now();
+        saving = await client.save();
+        if(saving.error){
+            return saving;
+        }
+        client = await Subscriber.getByEmail(client.mail);
+    }
+    const message = new Messenging();
+    message.lastname = data.cli_lname;
+    message.firstname = data.cli_fname;
+    message.client = client.id;
+    message.message = data.cli_msg;
+    message.postOn = AkaDatetime.now();
+    saving = await message.save();
+    if(saving.error){
+        return saving;
+    }
+    return Channel.message({
+        error: false,
+        code: code.SUCCESS
+    })
+}
+
+Wayto.getAllMessages = async (data)=>{
+    if(!Filter.contains(data, defaultQuery)){
+        return Channel.message({code: code.INVALID});
+    }
+    return Channel.message({
+        error: false,
+        code: code.SUCCESS,
+        data: await Messenging.fetchAll(data.bhid)
+    })
 }
 
 Wayto.commitCategories = async (data, sector)=>{
@@ -135,8 +192,8 @@ Wayto.commitCategories = async (data, sector)=>{
 }
 
 Wayto.commitRedaction = async (data)=>{
-    if(Filter.contains(data, [
-        'title','content', 'img','cmid','bhid','cmtk', 'category',
+    if(Filter.contains(data, [ ...defaultQuery,
+        'title','content', 'img', 'category',
         'schdate'
     ])){
 
@@ -186,7 +243,7 @@ Wayto.commitRedaction = async (data)=>{
 
 Wayto.commitPunchline = async (data)=>{
     if(!Filter.contains(data, [
-        'cmid', 'bhid','cmtk',
+        ...defaultQuery,
         'title','year','artist', 'category',
         'punchline', 'res'
     ], [null,0,''])){

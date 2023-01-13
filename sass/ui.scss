@@ -563,6 +563,16 @@ h1{
   /* background-color: unset; */
 }
 
+.ui-disabled{
+  &, &:hover, &:focus {
+    background-color: #ccc !important;
+    color: #888 !important;
+    border-color: #ccc !important;
+    cursor: auto !important;
+  }
+}
+
+
 $sizes : 480px, 768px, 992px, 1200px;
 $prefixes: sm, md, lg, xl;
 

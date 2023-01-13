@@ -1,6 +1,6 @@
 let list = [
     'Data','Articles','Branch','Manager','Category','TracableData',
-    'Pictures', 'Punchlines'
+    'Pictures', 'Punchlines', 'Messenging', 'Subscriber'
 ],
 modules = {};
 for(let i in list) {

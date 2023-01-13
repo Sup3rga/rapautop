@@ -1,5 +1,6 @@
 const Wayto = require('./wayto');
 const SocketTransfer = require('./sockettransfer');
+const CommonServe = require('./commonserve');
 
 function manage(socket){
     const tns = new SocketTransfer(socket);
@@ -20,7 +21,15 @@ function manage(socket){
     .transfer('/punchlines/fetch', "/punchlines/get", Wayto.getPunchlines)
     .transfer('/articles', "/articles/get", Wayto.getArticles)
     .transfer('/articles', "/articles/get", Wayto.getArticles)
-    .transfer('/articles', "/articles/get", Wayto.getArticles);
+    .transfer('/articles', "/articles/get", Wayto.getArticles)
+    .transfer('/messages/fetch', '/messages/get', Wayto.getAllMessages)
 }
 
-module.exports = manage;
+function serve(request, response){
+    new CommonServe(request, response)
+    .serve(['identifier','code'], Wayto.connect)
+    .serve(['cli_fname', 'cli_lname', 'cli_mail', 'cli_msg', 'cli_bhid'], Wayto.receiveMessage)
+    .notFound()
+}
+
+module.exports = {manage,serve};

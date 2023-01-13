@@ -91,6 +91,12 @@ button{
       border: 1px solid $background2;
       cursor: pointer;
     }
+    &.ui-disabled{
+      background-color: #ccc !important;
+      color: #888 !important;
+      border-color: #ccc !important;
+      cursor: auto;
+    }
   }
 }
 .caroussel{
@@ -495,6 +501,23 @@ footer{
       &.plain{
         height: calc(3 * var(--height));
       }
+    }
+  }
+  .loading{
+    padding: .5em;
+    .text{
+      padding: .4em;
+      font-family: Poppins-Light;
+    }
+  }
+  .message{
+    padding: .3em;
+    icon{
+      font-size: 2em;
+    }
+    .text{
+      padding: .4em .5em;
+      font-family: Poppins-Light;
     }
   }
 }

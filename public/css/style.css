@@ -662,31 +662,99 @@
 }
 
 /* line 522, ../../sass/style.scss */
+.messages .header {
+  padding: .4em;
+}
+/* line 524, ../../sass/style.scss */
+.messages .header .sort-chip {
+  margin: 0 .2em;
+}
+/* line 526, ../../sass/style.scss */
+.messages .header .sort-chip.icon icon {
+  font-size: 1.6em;
+  position: relative;
+  left: 6px;
+}
+/* line 533, ../../sass/style.scss */
+.messages .message-row {
+  padding: .4em;
+  padding-left: .8em;
+  text-decoration: none;
+  color: #000;
+  border-radius: .5em;
+  position: relative;
+}
+/* line 540, ../../sass/style.scss */
+.messages .message-row.unread:before {
+  position: absolute;
+  content: '';
+  width: 5px;
+  height: 60%;
+  background-color: #12172d;
+  left: .1em;
+  top: 20%;
+  border-radius: .8em;
+}
+/* line 550, ../../sass/style.scss */
+.messages .message-row .avatar {
+  border-radius: .7em;
+  background-color: #12172d;
+}
+/* line 554, ../../sass/style.scss */
+.messages .message-row .data {
+  padding: .2em 0 .2em .5em;
+}
+/* line 556, ../../sass/style.scss */
+.messages .message-row .data .name {
+  padding: .2em 0;
+  font-family: Poppins-SemiBold;
+  font-size: 1.1em;
+}
+/* line 561, ../../sass/style.scss */
+.messages .message-row .data .date {
+  font-family: Roboto-Light;
+  font-size: .8em;
+}
+/* line 565, ../../sass/style.scss */
+.messages .message-row .data .message {
+  padding: .2em .2em 1em .2em;
+  font-size: .9em;
+  border-bottom: 1px solid #ccc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* line 574, ../../sass/style.scss */
+.messages .message-row:hover {
+  background-color: #eee;
+}
+
+/* line 581, ../../sass/style.scss */
 .MuiFab-root {
   background-color: #12172d !important;
 }
-/* line 524, ../../sass/style.scss */
+/* line 583, ../../sass/style.scss */
 .MuiFab-root icon {
   color: white;
 }
 
-/* line 529, ../../sass/style.scss */
+/* line 588, ../../sass/style.scss */
 .css-sghohy-MuiButtonBase-root-MuiButton-root, .css-sghohy-MuiButtonBase-root-MuiButton-root.Mui-focused {
   background-color: #12172d;
   color: white;
 }
 
 @media (min-width: 768px) {
-  /* line 538, ../../sass/style.scss */
+  /* line 597, ../../sass/style.scss */
   #main-panel .sidemenu {
     width: 80px;
   }
-  /* line 541, ../../sass/style.scss */
+  /* line 600, ../../sass/style.scss */
   #main-panel .view-wrapper {
     width: calc(100% - 80px);
   }
 
-  /* line 545, ../../sass/style.scss */
+  /* line 604, ../../sass/style.scss */
   .studio {
     padding-bottom: .4em;
   }
