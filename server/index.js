@@ -33,49 +33,19 @@ let requestConfig = {
     limit: '10mb'
 }
 
-
 server.use(cors())
 server.use(bodyParser.json(requestConfig))
 server.use(bodyParser.raw(requestConfig))
-server.use(ths.watch(['artimg','upl_pch']))
+server.use(ths.watch(['artimg','upl_pch','mailimg']))
 
 io.on("connection", (socket)=>{
     manage(socket);
 });
 
 server
-.post('/submit', (request,response)=> serve(request.body,response))
-.post('/fetch', (request,response)=> serve(request.body,response))
-.post('/connect', (request,response)=> serve(request.body,response))
-.post('/upl_img', async (req, res)=>{
-    // console.log('[Body]',req.body);
-    let {
-        upl_artimg = [],
-        pch_img = []
-    } = req.body,
-        image = '';
-    for(let i in upl_artimg){
-        if(await ths.isUploaded(upl_artimg[i])){
-            if(await ths.isUploaded(upl_artimg[i])) {
-                const dest = await Pictures.nextName('A') + '.' + Pictures.extension(upl_artimg[i]);
-                image = '/assets/captions/' + dest;
-                await ths.move(upl_artimg[i], '../public/assets/captions/', dest);
-            }
-        }
-    }
-    if(pch_img.length){
-        image = [];
-    }
-    for(let i in pch_img){
-        if(await ths.isUploaded(pch_img[i])){
-            const dest = await Pictures.nextName('P') + '.' + Pictures.extension(pch_img[i]);
-            image.push('/assets/captions/'+dest);
-            await ths.move(pch_img[i], '../public/assets/captions/', dest);
-        }
-    }
-    res.json({
-        filename: image
-    })
-})
+.post('/submit', (request,response)=> serve(request.body,response,ths))
+.post('/fetch', (request,response)=> serve(request.body,response,ths))
+.post('/connect', (request,response)=> serve(request.body,response,ths))
+.post('/upl_img', (request, response)=> serve(request.body,response,ths))
 
 httpServer.listen(PORT);

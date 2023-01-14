@@ -9,6 +9,38 @@ function empty(val){
     return val === '' || val == null;
 }
 
+function computeToHexa(value){
+    if(isNaN(value)){
+        return 0;
+    }
+    let result = value, buffer = '', cpu;
+    const base = [0,1,2,3,4,5,6,7,8,9,'a','b','c','d','e','f'];
+    if(base[value]){
+        return base[value];
+    }
+    else{
+        do{
+            cpu = result % 16;
+            buffer = (cpu in base ? base[cpu] : cpu)+buffer;
+            result = Math.floor(result / 16);
+            if(result < 16){
+                buffer = (result in base ? base[result] : result)+buffer;
+            }
+        }while(result >= 16);
+    }
+    return buffer;
+}
+
+function toHexa(value,sequence=2){
+    let result = '', next = 0;
+    value = value.toString();
+    for(let i = 0; i < value.length - sequence; i += sequence){
+        next = (i + sequence) >= value.length - sequence ? value.length - 1 : i + sequence;
+        result += computeToHexa(value.substr(i,2) * 1);
+    }
+    return result;
+}
+
 function time(){
     return new Date().getTime();
 }
@@ -69,5 +101,5 @@ function in_array(list = [], element, ignoreCase = false){
 module.exports = {
     isset,empty,time,is_array,base64_decode,
     is_file,rename,unlink,buffer_base64,
-    filter,in_array
+    filter,in_array,toHexa
 };

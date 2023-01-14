@@ -1,15 +1,17 @@
 let {
     Articles,Category,Punchlines,
-    Messenging, Manager, Subscriber
+    Messenging, Manager, Subscriber, Pictures,
+    MailingReply
 } = require('../data/dataPackage');
 const code = require('../utils/ResponseCode'),
     Channel = require('../utils/Channel');
 const Filter = require("../utils/Filter");
-const {is_array,isset,is_file,unlink} = require('../utils/procedures');
+const {is_array,isset,is_file,unlink,toHexa} = require('../utils/procedures');
 const AkaDatetime = require('../utils/AkaDatetime');
 const fs = require('fs');
 const {promisify} = require('util');
 const defaultQuery = ['cmid', 'bhid','cmtk'];
+const privilegies = require('../data/Privilegies');
 
 const Wayto = {};
 
@@ -129,15 +131,143 @@ Wayto.receiveMessage = async (data)=>{
     })
 }
 
+Wayto.readMessage = async (data, passBy = false) => {
+    if(!passBy && !Filter.contains(data, [...defaultQuery, 'msgid'])){
+        return Channel.message({code: code.INVALID});
+    }
+    let result = await Messenging.getById(data.msgid);
+    if(result){
+        if(!result.readBy){
+            result.readBy = data.cmid;
+            const saving = await result.save();
+            if(saving.error){
+                result.readBy = null;
+            }
+        }
+        result = await result.data(false);
+    }
+    return Channel.message({
+        error: false,
+        code: code.SUCCESS,
+        data: result
+    })
+}
+
 Wayto.getAllMessages = async (data)=>{
+    console.log('[messages]',data);
+    if(!Filter.contains(data, defaultQuery)){
+        return Channel.message({code: code.INVALID});
+    }
+    let result = null;
+    if('msgid' in data){
+        result = await Wayto.readMessage(data,true);
+        result = result.data;
+    }
+    else{
+        result = await Messenging.fetchAll(data.bhid);
+    }
+    return Channel.message({
+        error: false,
+        code: code.SUCCESS,
+        data: result
+    })
+}
+
+Wayto.replyMessage = async (data)=>{
+    if(!Filter.contains(data, [
+        ...defaultQuery,
+        'msgid','subject','message'
+    ], [null, 0, ''])){
+        return Channel.message({code: code.INVALID});
+    }
+    let message = await Messenging.getById(data.msgid);
+    const reply = new MailingReply();
+    reply.client = message.client;
+    reply.object = data.subject;
+    reply.body = data.message;
+    reply.createdAt = AkaDatetime.now();
+    reply.postOn = reply.createdAt;
+    reply.createdBy = data.cmid;
+    reply.message = data.msgid;
+    const saving = await reply.save();
+    if(saving.error) return saving;
+    message = await Messenging.getById(data.msgid);
+    return Channel.message({
+        error: false,
+        code: code.SUCCESS,
+        data: await message.data()
+    })
+}
+
+Wayto.deleteMessage = async (data)=>{
+    if(!Filter.contains(data, [
+        ...defaultQuery,
+        'delid'
+    ], [null, 0, ''])){
+        return Channel.message({code: code.INVALID});
+    }
+    let message = await Messenging.getById(data.delid);
+    let saving = await message.delete();
+    return saving;
+}
+
+Wayto.uploadArticleImage = async (data,ths)=>{
+    let {upl_artimg = []} = data,
+        image = '';
+    for(let i in upl_artimg){
+        if(await ths.isUploaded(upl_artimg[i])){
+            if(await ths.isUploaded(upl_artimg[i])) {
+                const dest = await Pictures.nextName('A') + '.' + Pictures.extension(upl_artimg[i]);
+                image = '/assets/captions/' + dest;
+                await ths.move(upl_artimg[i], DIR.PUBLIC+'/assets/captions/', dest);
+            }
+        }
+    }
+    return {
+        filename: image
+    }
+}
+
+Wayto.uploadPunchlineImage = async (data,ths)=>{
+    let {pch_img = []} = data,
+        image = [];
+    for(let i in pch_img){
+        if(await ths.isUploaded(pch_img[i])){
+            const dest = await Pictures.nextName('P') + '.' + Pictures.extension(pch_img[i]);
+            image.push('/assets/captions/'+dest);
+            await ths.move(pch_img[i], DIR.PUBLIC+'/assets/captions/', dest);
+        }
+    }
+    return{
+        filename: image
+    };
+}
+
+Wayto.uploadMailImage = async (data,ths)=>{
+    let {upl_mailimg = []} = data,
+        image = '';
+    for(let i in upl_mailimg){
+        if(await ths.isUploaded(upl_mailimg[i])){
+            const dest = toHexa(Pictures.baseName(upl_mailimg[i]))+'.' + Pictures.extension(upl_mailimg[i]);
+            image = '/assets/mailing/'+dest;
+            await ths.move(upl_mailimg[i], DIR.PUBLIC+'/assets/mailing/', dest);
+        }
+    }
+    return{
+        filename: image
+    };
+}
+
+Wayto.getPrivilegies = async (data)=>{
+    console.log('[Received]',data);
     if(!Filter.contains(data, defaultQuery)){
         return Channel.message({code: code.INVALID});
     }
     return Channel.message({
         error: false,
         code: code.SUCCESS,
-        data: await Messenging.fetchAll(data.bhid)
-    })
+        data: privilegies
+    });
 }
 
 Wayto.commitCategories = async (data, sector)=>{

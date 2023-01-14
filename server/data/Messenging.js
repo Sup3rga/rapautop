@@ -5,6 +5,7 @@ const code = require('../utils/ResponseCode');
 const {Pdo} = require('../utils/Connect');
 const Subscriber = require('./Subscriber');
 const AkaDatetime = require('../utils/AkaDatetime');
+const MailingReply = require("./MailingReply");
 
 class Messenging extends Data{
     constructor() {
@@ -16,6 +17,7 @@ class Messenging extends Data{
         this.message = null;
         this.postOn = null;
         this.readBy = 0;
+        this.replies = [];
     }
 
     async save(){
@@ -37,7 +39,7 @@ class Messenging extends Data{
                     p5: this.postOn
                 })
             }
-            else if(!this.readBy){
+            else if(this.readBy){
                 await Pdo.prepare(`
                     update messenging set read_by=:p1 where id=:p2
                 `).execute({
@@ -54,7 +56,7 @@ class Messenging extends Data{
         });
     }
 
-    async data(_public = true){
+    async data(_public = false){
         const data = Filter.object(this, [
             'id', 'lastname', 'firstname', 'client',
             'message', 'readBy', 'postOn'
@@ -64,6 +66,7 @@ class Messenging extends Data{
             data.read = this.readBy > 0;
         }
         else{
+            data.replies = await MailingReply.getByMessage(this.id, true);
             data.client = await (await Subscriber.getById(data.client)).data();
         }
         return data;
@@ -83,6 +86,14 @@ class Messenging extends Data{
     async delete(){
         if(!this.id) return Channel.message({code: code.INVALID});
         try{
+            let saving;
+            const list = await MailingReply.getByMessage(this.id, false);
+            for(let i in list){
+                saving = await list[i].delete();
+                if(saving.error){
+                    return saving;
+                }
+            }
             await Pdo.prepare("delete from messenging where id=:id").execute({id: this.id});
         }catch (e){
             return Channel.logError(e).message({code: code.INTERNAL});
@@ -93,6 +104,11 @@ class Messenging extends Data{
         })
     }
 
+    /**
+     *
+     * @param id
+     * @returns {Promise<null|Messenging>}
+     */
     static async getById(id){
         let message = null;
         try{

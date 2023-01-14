@@ -142,6 +142,10 @@ class Pictures extends Data{
     static extension(value){
         return value.replace(/^(?:[\S]+)\.([\S]+)$/, '$1');
     }
+
+    static baseName(value){
+        return value.replace(/^([\S]+)\.(?:[\S]+)$/, '$1');
+    }
 }
 
 module.exports = Pictures;

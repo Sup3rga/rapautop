@@ -577,6 +577,88 @@ $bottom-bar-height: 60px;
   }
 }
 
+.inbox{
+  padding: .4em;
+  .header{
+    padding: .4em;
+    border-bottom: 1px solid #ccc;
+    .name{
+      padding: .3em 0;
+      font-family: Lexend-Medium;
+      font-size: 1.2em;
+    }
+    .reference{
+      padding: .2em 0;
+      .data{
+        padding: 0 .3em;
+        font-family: Roboto;
+        font-size: .9em;
+      }
+    }
+  }
+  .body{
+    padding: .4em;
+    .replier{
+      background-color: #fff;
+      @include transform(translate3d(0,100%,0));
+      transition-duration: .3s;
+      transition-property: transform;
+      &.open{
+        @include transform(translate3d(0,0,0));
+      }
+    }
+    .message{
+      padding: .5em;
+    }
+    .reply{
+      padding: .4em;
+      border-radius: .8em;
+      background-color: rgba(240,240,240,.7);
+      border: 1px solid #ddd;
+      margin: .2em 0;
+      &:first-child{
+        padding-top: .8em;
+      }
+      .header{
+        padding: .3em;
+        icon{
+          font-size: 1.3em;
+          padding: .5em;
+        }
+        .subject{
+          padding: 0 .4em;
+          font-family: Lexend-Medium;
+        }
+        .by{
+          padding: .4em;
+        }
+        .date{
+          font-size: .8em;
+        }
+      }
+    }
+  }
+}
+
+.integration{
+  padding: .2em;
+  .header{
+    padding: .4em;
+  }
+  .wrapper{
+    padding: .3em;
+  }
+  .privilegies-list{
+    padding: 0 .4em;
+    .privileges-group{
+      padding: .2em;
+    }
+    .privilegies-items{
+      padding: .2em .2em .2em 2em;
+    }
+  }
+}
+
 //@Override
 .MuiFab-root{
   background-color: $theme !important;
