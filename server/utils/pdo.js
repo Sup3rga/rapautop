@@ -152,7 +152,7 @@ class PDO {
                 }
             }
         }
-        if(!this.connected){
+        if(!this.connected && this.logError){
             throw new Error(this.logError);
         }
         if(this.driver == 'mysql'){

@@ -36,11 +36,9 @@ let requestConfig = {
 server.use(cors())
 server.use(bodyParser.json(requestConfig))
 server.use(bodyParser.raw(requestConfig))
-server.use(ths.watch(['artimg','upl_pch','mailimg']))
+server.use(ths.watch(['artimg','upl_pch','mailimg','upl_avt']))
 
-io.on("connection", (socket)=>{
-    manage(socket);
-});
+io.on("connection", (socket)=>manage(socket));
 
 server
 .post('/submit', (request,response)=> serve(request.body,response,ths))

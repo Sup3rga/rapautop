@@ -11,15 +11,18 @@ const AkaDatetime = require('../utils/AkaDatetime');
 const fs = require('fs');
 const {promisify} = require('util');
 const defaultQuery = ['cmid', 'bhid','cmtk'];
-const privileges = require('../data/Privilegies');
+const privileges = require('../data/Privileges');
 
 const Wayto = {};
 
 Wayto.startManagement = async () =>{
-    if(Manager.list.length){
-        return;
+    if(Manager.list.length > 0){
+        return true;
     }
-    await Manager.fetchAll();
+    else {
+        console.log('[Man]...',Manager.list.length);
+        await Manager.fetchAll();
+    }
 }
 
 Wayto.connect = async (data)=>{
@@ -49,7 +52,7 @@ Wayto.getAllWritingData = async (data)=>{
 }
 
 Wayto.getArticles = async (data)=>{
-    if(Filter.contains(data, [
+    if(!Filter.contains(data, [
         'artid', ...defaultQuery
     ])){
         return Channel.message({
@@ -265,6 +268,22 @@ Wayto.uploadMailImage = async (data,ths)=>{
     };
 }
 
+Wayto.uploadAvatar = async (data,ths)=>{
+    let {avatar = []} = data,
+        image = '';
+    console.log('[Uploading]...');
+    for(let i in avatar){
+        if(await ths.isUploaded(avatar[i])){
+            const dest = toHexa(Pictures.baseName(avatar[i]))+'.' + Pictures.extension(avatar[i]);
+            image = '/assets/avatar/'+dest;
+            await ths.move(avatar[i], DIR.PUBLIC+'/assets/avatar/', dest);
+        }
+    }
+    return{
+        filename: image
+    };
+}
+
 Wayto.getPrivileges = async (data)=>{
     console.log('[Received]',data);
     if(!Filter.contains(data, defaultQuery)){
@@ -285,10 +304,10 @@ Wayto.checkIfAvailable = async (data, zone)=>{
     let response = false;
     switch (zone){
         case granted[0]:
-            response = await Manager.emailExist(data.value);
+            response = await Manager.emailExist(data.value,data.manid);
             break;
         case granted[1]:
-            response = await Manager.nicknameExist(data.value);
+            response = await Manager.nicknameExist(data.value,data.manid);
             break;
     }
     return Channel.message({
@@ -301,20 +320,28 @@ Wayto.checkIfAvailable = async (data, zone)=>{
 Wayto.integrateNewManager = async (data)=>{
     if(!Filter.contains(data,[
         ...defaultQuery,
-        'firstname', 'lastname', 'nickname', 'email', 'phone', 'password',
-        'privileges'
+        'firstname', 'lastname', 'nickname', 'email', 'phone', 'auth'
     ], [null, '',0])){
         return Channel.message({code: code.INVALID});
     }
+
+
+    const auth = await Manager.connect(data.cmid, data.auth);
+    if(auth.error) return auth;
+
     const update = 'id' in data;
-    if(!update && !isset(data.password)){
+    const selfRequest = update && data.id == data.cmid;
+
+
+    if(!update && (!isset(data.password) || !isset(data.privileges)) ){
         return Channel.message({code: code.INVALID});
     }
+
     const manager = update ? await Manager.getById(data.id) : new Manager();
 
     if(!manager) return Channel.message({code: code.INVALID});
 
-    if(!update){
+    if(!update || (update && selfRequest && data.password && data.password.length)){
         manager.code = data.password;
     }
     manager.firstname = data.firstname;
@@ -322,10 +349,49 @@ Wayto.integrateNewManager = async (data)=>{
     manager.mail = data.email;
     manager.nickname = data.nickname;
     manager.phone = data.phone;
-    manager.createdBy = data.cmid;
-    manager.createdAt = AkaDatetime.now();
-    manager.branches = data.privileges;
-    manager.active = true;
+    if(!update) {
+        manager.createdBy = data.cmid;
+        manager.createdAt = AkaDatetime.now();
+        manager.branches = data.privileges;
+        manager.active = true;
+    }
+    else if(isset(data.privileges)){
+        manager.branches = data.privileges;
+    }
+
+    return await manager.save();
+}
+
+Wayto.resetManagerPassword = async (data)=>{
+    if(!Filter.contains(data, [...defaultQuery, 'psw', 'auth', 'manid'])){
+        return Channel.message({code:code.INVALID});
+    }
+
+    const auth = await Manager.connect(data.cmid, data.auth);
+    if(auth.error) return auth;
+
+    const manager = await Manager.getById(data.manid);
+
+    if(!manager) return Channel.message({code: code.INVALID});
+
+    manager.code = data.psw;
+
+    return await manager.save();
+}
+
+Wayto.blockManager = async (data)=>{
+    if(!Filter.contains(data, [...defaultQuery, 'block', 'auth', 'manid'])){
+        return Channel.message({code:code.INVALID});
+    }
+
+    const auth = await Manager.connect(data.cmid, data.auth);
+    if(auth.error) return auth;
+
+    const manager = await Manager.getById(data.manid);
+
+    if(!manager) return Channel.message({code: code.INVALID});
+
+    manager.active = data.block;
 
     return await manager.save();
 }
@@ -339,6 +405,32 @@ Wayto.getAllManagers = async (data)=>{
         error: false,
         data: await Manager.filter(data.bhid, [data.cmid])
     });
+}
+
+Wayto.getManager = async (data)=>{
+    if(!Filter.contains(data, [...defaultQuery, 'manid'])){
+        return Channel.message({code: code.INVALID});
+    }
+    const manager = await Manager.getById(data.manid);
+
+    if(!manager) return Channel.message({code: code.INVALID});
+
+    return Channel.message({
+        error: false,
+        code: code.SUCCESS,
+        data: await manager.data()
+    });
+}
+
+Wayto.setManagerAvatar = async (data)=>{
+    if(!Filter.contains(data, [...defaultQuery, 'res'])){
+        return Channel.message({code: code.INVALID});
+    }
+    const manager = await Manager.getById(data.cmid);
+
+    if(!manager) return Channel.message({code: code.INVALID});
+
+    return await manager.setAvatar(data.res);
 }
 
 Wayto.commitCategories = async (data, sector)=>{

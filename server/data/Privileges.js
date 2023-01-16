@@ -1,4 +1,4 @@
-module.exports = {
+const Privileges = {
     groups: {
       "Redacteur": [1,99],
       "Punchline maker": [100,199],
@@ -37,6 +37,23 @@ module.exports = {
         405: "Accès aux rapports",
         406: "Assigner les community manager aux filiales",
         407: "Assigner les privilèges aux utilisateurs",
-        408: "Activer/Désactiver un utilisateur"
+        408: "Activer/Désactiver un utilisateur",
+        409: "Gestion des filiales"
+    },
+    summary: {}
+}
+
+for(let i in Privileges.privileges){
+    for(let j in Privileges.groups){
+        if(
+            i >= Privileges.groups[j][0] &&
+            i <= Privileges.groups[j][1]
+        ){
+            if(!(j in Privileges.summary)){
+                Privileges.summary[j] = 0;
+            }
+            Privileges.summary[j]++;
+        }
     }
 }
+module.exports = Privileges;

@@ -12,6 +12,7 @@ $theme : var(--theme);
 $theme-color: var(--theme-color);
 $header-height: var(--header-height);
 $fonts : (var(--font-family0), var(--font-family1));
+$background2: #12172d;
 
 @mixin backdrop-filter($value){
   backdrop-filter: $value;
@@ -32,6 +33,12 @@ $fonts : (var(--font-family0), var(--font-family1));
   //background-color: rgba(240,240,240,0.4);
   //border-radius: 50%;
   cursor: pointer;
+}
+
+%ellipsis-text{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 %article-reading-view{

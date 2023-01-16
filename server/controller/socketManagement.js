@@ -21,8 +21,6 @@ async function manage(socket){
     .transfer('/punchlines/create', "/punchlines/get", Wayto.commitPunchline)
     .transfer('/punchlines/fetch', "/punchlines/get", Wayto.getPunchlines)
     .transfer('/articles', "/articles/get", Wayto.getArticles)
-    .transfer('/articles', "/articles/get", Wayto.getArticles)
-    .transfer('/articles', "/articles/get", Wayto.getArticles)
     .transfer('/messages/fetch', '/messages/get', Wayto.getAllMessages)
     .transfer('/message/reply', '/message/get', Wayto.replyMessage)
     .transfer('/message/delete', '/message/remove', Wayto.deleteMessage)
@@ -30,7 +28,11 @@ async function manage(socket){
     .transfer('/manager/nickname/check', '/manager/nickname/is', Wayto.checkIfAvailable, ['nickname'])
     .transfer('/manager/email/check', '/manager/email/is', Wayto.checkIfAvailable, ['mail'])
     .transfer('/manager/integration', '/manager/approval', Wayto.integrateNewManager)
-    .transfer('/manager/list', '/manager/get', Wayto.getAllManagers)
+    .transfer('/management/list', '/management/get', Wayto.getAllManagers)
+    .transfer('/management/member', '/management/get', Wayto.getManager)
+    .transfer('/manager/reset', '/manager/get', Wayto.resetManagerPassword)
+    .transfer('/manager/block', '/manager/get', Wayto.blockManager)
+    .transfer('/manager/avatar/set', '/manager/get', Wayto.setManagerAvatar);
 }
 
 function serve(request, response, uploader){
@@ -40,6 +42,7 @@ function serve(request, response, uploader){
     .serve(['upl_artimg'], Wayto.uploadArticleImage, [uploader])
     .serve(['pch_img'], Wayto.uploadPunchlineImage, [uploader])
     .serve(['upl_mailimg'], Wayto.uploadMailImage, [uploader])
+    .serve(['avatar'], Wayto.uploadAvatar, [uploader])
     .notFound();
 }
 
