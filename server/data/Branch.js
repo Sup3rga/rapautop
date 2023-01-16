@@ -14,6 +14,7 @@ class Branch extends Data{
     save(){
 
     }
+
 }
 
 module.exports = Branch;

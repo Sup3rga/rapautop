@@ -2,7 +2,8 @@ const Wayto = require('./wayto');
 const SocketTransfer = require('./sockettransfer');
 const CommonServe = require('./commonserve');
 
-function manage(socket){
+async function manage(socket){
+    await Wayto.startManagement();
     const tns = new SocketTransfer(socket);
     tns
     .transfer(null, 'connected',null)
@@ -25,7 +26,11 @@ function manage(socket){
     .transfer('/messages/fetch', '/messages/get', Wayto.getAllMessages)
     .transfer('/message/reply', '/message/get', Wayto.replyMessage)
     .transfer('/message/delete', '/message/remove', Wayto.deleteMessage)
-    .transfer('/privilegies/fetch', '/privilegies/get', Wayto.getPrivilegies)
+    .transfer('/privilegies/fetch', '/privilegies/get', Wayto.getPrivileges)
+    .transfer('/manager/nickname/check', '/manager/nickname/is', Wayto.checkIfAvailable, ['nickname'])
+    .transfer('/manager/email/check', '/manager/email/is', Wayto.checkIfAvailable, ['mail'])
+    .transfer('/manager/integration', '/manager/approval', Wayto.integrateNewManager)
+    .transfer('/manager/list', '/manager/get', Wayto.getAllManagers)
 }
 
 function serve(request, response, uploader){
@@ -35,7 +40,7 @@ function serve(request, response, uploader){
     .serve(['upl_artimg'], Wayto.uploadArticleImage, [uploader])
     .serve(['pch_img'], Wayto.uploadPunchlineImage, [uploader])
     .serve(['upl_mailimg'], Wayto.uploadMailImage, [uploader])
-    .notFound()
+    .notFound();
 }
 
 module.exports = {manage,serve};

@@ -661,22 +661,8 @@
   font-size: .8em;
 }
 
-/* line 522, ../../sass/style.scss */
-.messages .header {
-  padding: .4em;
-}
-/* line 524, ../../sass/style.scss */
-.messages .header .sort-chip {
-  margin: 0 .2em;
-}
-/* line 526, ../../sass/style.scss */
-.messages .header .sort-chip.icon icon {
-  font-size: 1.6em;
-  position: relative;
-  left: 6px;
-}
-/* line 533, ../../sass/style.scss */
-.messages .message-row {
+/* line 521, ../../sass/style.scss */
+.message-row {
   padding: .4em;
   padding-left: .8em;
   text-decoration: none;
@@ -684,8 +670,8 @@
   border-radius: .5em;
   position: relative;
 }
-/* line 540, ../../sass/style.scss */
-.messages .message-row.unread:before {
+/* line 528, ../../sass/style.scss */
+.message-row.unread:before {
   position: absolute;
   content: '';
   width: 5px;
@@ -695,28 +681,28 @@
   top: 20%;
   border-radius: .8em;
 }
-/* line 550, ../../sass/style.scss */
-.messages .message-row .avatar {
+/* line 538, ../../sass/style.scss */
+.message-row .avatar {
   border-radius: .7em;
   background-color: #12172d;
 }
-/* line 554, ../../sass/style.scss */
-.messages .message-row .data {
+/* line 542, ../../sass/style.scss */
+.message-row .data {
   padding: .2em 0 .2em .5em;
 }
-/* line 556, ../../sass/style.scss */
-.messages .message-row .data .name {
+/* line 544, ../../sass/style.scss */
+.message-row .data .name {
   padding: .2em 0;
   font-family: Poppins-SemiBold;
   font-size: 1.1em;
 }
-/* line 561, ../../sass/style.scss */
-.messages .message-row .data .date {
+/* line 549, ../../sass/style.scss */
+.message-row .data .date {
   font-family: Roboto-Light;
   font-size: .8em;
 }
-/* line 565, ../../sass/style.scss */
-.messages .message-row .data .message {
+/* line 553, ../../sass/style.scss */
+.message-row .data .message {
   padding: .2em .2em 1em .2em;
   font-size: .9em;
   border-bottom: 1px solid #ccc;
@@ -724,41 +710,56 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* line 574, ../../sass/style.scss */
-.messages .message-row:hover {
+/* line 562, ../../sass/style.scss */
+.message-row:hover {
   background-color: #eee;
 }
 
-/* line 580, ../../sass/style.scss */
+/* line 568, ../../sass/style.scss */
+.messages .header {
+  padding: .4em;
+}
+/* line 570, ../../sass/style.scss */
+.messages .header .sort-chip {
+  margin: 0 .2em;
+}
+/* line 572, ../../sass/style.scss */
+.messages .header .sort-chip.icon icon {
+  font-size: 1.6em;
+  position: relative;
+  left: 6px;
+}
+
+/* line 581, ../../sass/style.scss */
 .inbox {
   padding: .4em;
 }
-/* line 582, ../../sass/style.scss */
+/* line 583, ../../sass/style.scss */
 .inbox .header {
   padding: .4em;
   border-bottom: 1px solid #ccc;
 }
-/* line 585, ../../sass/style.scss */
+/* line 586, ../../sass/style.scss */
 .inbox .header .name {
   padding: .3em 0;
   font-family: Lexend-Medium;
   font-size: 1.2em;
 }
-/* line 590, ../../sass/style.scss */
+/* line 591, ../../sass/style.scss */
 .inbox .header .reference {
   padding: .2em 0;
 }
-/* line 592, ../../sass/style.scss */
+/* line 593, ../../sass/style.scss */
 .inbox .header .reference .data {
   padding: 0 .3em;
   font-family: Roboto;
   font-size: .9em;
 }
-/* line 599, ../../sass/style.scss */
+/* line 600, ../../sass/style.scss */
 .inbox .body {
   padding: .4em;
 }
-/* line 601, ../../sass/style.scss */
+/* line 602, ../../sass/style.scss */
 .inbox .body .replier {
   background-color: #fff;
   -moz-transform: translate3d(0, 100%, 0);
@@ -768,18 +769,18 @@
   transition-duration: .3s;
   transition-property: transform;
 }
-/* line 606, ../../sass/style.scss */
+/* line 607, ../../sass/style.scss */
 .inbox .body .replier.open {
   -moz-transform: translate3d(0, 0, 0);
   -ms-transform: translate3d(0, 0, 0);
   -webkit-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
 }
-/* line 610, ../../sass/style.scss */
+/* line 611, ../../sass/style.scss */
 .inbox .body .message {
   padding: .5em;
 }
-/* line 613, ../../sass/style.scss */
+/* line 614, ../../sass/style.scss */
 .inbox .body .reply {
   padding: .4em;
   border-radius: .8em;
@@ -787,84 +788,88 @@
   border: 1px solid #ddd;
   margin: .2em 0;
 }
-/* line 619, ../../sass/style.scss */
+/* line 620, ../../sass/style.scss */
 .inbox .body .reply:first-child {
   padding-top: .8em;
 }
-/* line 622, ../../sass/style.scss */
+/* line 623, ../../sass/style.scss */
 .inbox .body .reply .header {
   padding: .3em;
 }
-/* line 624, ../../sass/style.scss */
+/* line 625, ../../sass/style.scss */
 .inbox .body .reply .header icon {
   font-size: 1.3em;
   padding: .5em;
 }
-/* line 628, ../../sass/style.scss */
+/* line 629, ../../sass/style.scss */
 .inbox .body .reply .header .subject {
   padding: 0 .4em;
   font-family: Lexend-Medium;
 }
-/* line 632, ../../sass/style.scss */
+/* line 633, ../../sass/style.scss */
 .inbox .body .reply .header .by {
   padding: .4em;
 }
-/* line 635, ../../sass/style.scss */
+/* line 636, ../../sass/style.scss */
 .inbox .body .reply .header .date {
   font-size: .8em;
 }
 
-/* line 643, ../../sass/style.scss */
+/* line 644, ../../sass/style.scss */
 .integration {
   padding: .2em;
 }
-/* line 645, ../../sass/style.scss */
+/* line 646, ../../sass/style.scss */
 .integration .header {
   padding: .4em;
 }
-/* line 648, ../../sass/style.scss */
+/* line 649, ../../sass/style.scss */
 .integration .wrapper {
   padding: .3em;
 }
-/* line 651, ../../sass/style.scss */
+/* line 652, ../../sass/style.scss */
+.integration .branch {
+  padding: .4em .2em;
+}
+/* line 655, ../../sass/style.scss */
 .integration .privilegies-list {
   padding: 0 .4em;
 }
-/* line 653, ../../sass/style.scss */
+/* line 657, ../../sass/style.scss */
 .integration .privilegies-list .privileges-group {
   padding: .2em;
 }
-/* line 656, ../../sass/style.scss */
+/* line 660, ../../sass/style.scss */
 .integration .privilegies-list .privilegies-items {
   padding: .2em .2em .2em 2em;
 }
 
-/* line 663, ../../sass/style.scss */
+/* line 667, ../../sass/style.scss */
 .MuiFab-root {
   background-color: #12172d !important;
 }
-/* line 665, ../../sass/style.scss */
+/* line 669, ../../sass/style.scss */
 .MuiFab-root icon {
   color: white;
 }
 
-/* line 670, ../../sass/style.scss */
+/* line 674, ../../sass/style.scss */
 .css-sghohy-MuiButtonBase-root-MuiButton-root, .css-sghohy-MuiButtonBase-root-MuiButton-root.Mui-focused {
   background-color: #12172d;
   color: white;
 }
 
 @media (min-width: 768px) {
-  /* line 679, ../../sass/style.scss */
+  /* line 683, ../../sass/style.scss */
   #main-panel .sidemenu {
     width: 80px;
   }
-  /* line 682, ../../sass/style.scss */
+  /* line 686, ../../sass/style.scss */
   #main-panel .view-wrapper {
     width: calc(100% - 80px);
   }
 
-  /* line 686, ../../sass/style.scss */
+  /* line 690, ../../sass/style.scss */
   .studio {
     padding-bottom: .4em;
   }

@@ -6,7 +6,7 @@ module.exports = {
       "Gestionnaire du site": [300,399],
       "Super utilisateur": [400,499]
     },
-    privilegies: {
+    privileges: {
         0: "Modifier ses informations personnelles",
         1: "Écrire et modifier article",
         2: "Participer à d'autre rédaction",
@@ -29,13 +29,14 @@ module.exports = {
         301: "Définir la configuration par défaut des punchlines",
         302: "Définir les visibilités pour les publications",
         303: "Définir le texte de présentation du site",
-        400: "Modifier les mots de passe des utilisateurs",
-        401: "Modifier les informations personnelles des utilisateurs",
-        402: "Supprimer les catégories de punchline",
-        402: "Supprimer les catégories de punchline",
-        404: "Accès aux rapports",
-        405: "Assigner les community manager aux filiales",
-        406: "Assigner les privilèges aux utilisateurs",
-        407: "Activer/Désactiver un utilisateur"
+        400: "Intégrer de nouveaux membres",
+        401: "Modifier les mots de passe des utilisateurs",
+        402: "Modifier les informations personnelles des utilisateurs",
+        403: "Supprimer les catégories de punchline",
+        404: "Supprimer les catégories de punchline",
+        405: "Accès aux rapports",
+        406: "Assigner les community manager aux filiales",
+        407: "Assigner les privilèges aux utilisateurs",
+        408: "Activer/Désactiver un utilisateur"
     }
 }

@@ -11,9 +11,16 @@ const AkaDatetime = require('../utils/AkaDatetime');
 const fs = require('fs');
 const {promisify} = require('util');
 const defaultQuery = ['cmid', 'bhid','cmtk'];
-const privilegies = require('../data/Privilegies');
+const privileges = require('../data/Privilegies');
 
 const Wayto = {};
+
+Wayto.startManagement = async () =>{
+    if(Manager.list.length){
+        return;
+    }
+    await Manager.fetchAll();
+}
 
 Wayto.connect = async (data)=>{
     if(!Filter.contains(data, ['identifier', 'code'])){
@@ -258,7 +265,7 @@ Wayto.uploadMailImage = async (data,ths)=>{
     };
 }
 
-Wayto.getPrivilegies = async (data)=>{
+Wayto.getPrivileges = async (data)=>{
     console.log('[Received]',data);
     if(!Filter.contains(data, defaultQuery)){
         return Channel.message({code: code.INVALID});
@@ -266,7 +273,71 @@ Wayto.getPrivilegies = async (data)=>{
     return Channel.message({
         error: false,
         code: code.SUCCESS,
-        data: privilegies
+        data: privileges
+    });
+}
+
+Wayto.checkIfAvailable = async (data, zone)=>{
+    const granted = ['mail', 'nickname'];
+    if(granted.indexOf(zone) < 0 || !Filter.contains(data, [...defaultQuery, 'value'])){
+        return Channel.message({code: code.INVALID});
+    }
+    let response = false;
+    switch (zone){
+        case granted[0]:
+            response = await Manager.emailExist(data.value);
+            break;
+        case granted[1]:
+            response = await Manager.nicknameExist(data.value);
+            break;
+    }
+    return Channel.message({
+        code: code.SUCCESS,
+        error: false,
+        data: !response
+    });
+}
+
+Wayto.integrateNewManager = async (data)=>{
+    if(!Filter.contains(data,[
+        ...defaultQuery,
+        'firstname', 'lastname', 'nickname', 'email', 'phone', 'password',
+        'privileges'
+    ], [null, '',0])){
+        return Channel.message({code: code.INVALID});
+    }
+    const update = 'id' in data;
+    if(!update && !isset(data.password)){
+        return Channel.message({code: code.INVALID});
+    }
+    const manager = update ? await Manager.getById(data.id) : new Manager();
+
+    if(!manager) return Channel.message({code: code.INVALID});
+
+    if(!update){
+        manager.code = data.password;
+    }
+    manager.firstname = data.firstname;
+    manager.lastname = data.lastname;
+    manager.mail = data.email;
+    manager.nickname = data.nickname;
+    manager.phone = data.phone;
+    manager.createdBy = data.cmid;
+    manager.createdAt = AkaDatetime.now();
+    manager.branches = data.privileges;
+    manager.active = true;
+
+    return await manager.save();
+}
+
+Wayto.getAllManagers = async (data)=>{
+    if(!Filter.contains(data, defaultQuery)){
+        return Channel.message({code: code.INVALID});
+    }
+    return Channel.message({
+        code: code.SUCCESS,
+        error: false,
+        data: await Manager.filter(data.bhid, [data.cmid])
     });
 }
 
