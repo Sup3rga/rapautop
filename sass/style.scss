@@ -7,6 +7,10 @@ $sidemenu-width:  80px;
 $bar-height: 55px;
 $bottom-bar-height: 60px;
 
+.ellipsis-text{
+  @extend %ellipsis-text;
+}
+
 .dialog-box{
   z-index: 4;
   overflow: hidden;
@@ -804,6 +808,22 @@ $bottom-bar-height: 60px;
     font-size: 1.4em;
     margin-bottom: .4em;
     color: #777;
+  }
+}
+
+.settings{
+  h1{
+    padding: .5em;
+  }
+  .search-zone{
+    border-radius: 2em;
+  }
+  .color-intent{
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    border-radius: .4em;
+    @include box-shadow(0 0 2px 1px #888);
   }
 }
 

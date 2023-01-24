@@ -331,10 +331,11 @@ class Manager extends Data{
                 .execute();
             // console.trace('[Man][list][ttl]..',Manager.list.length, req.rowCount);
             let data;
+            console.log('[Before]',req.rowCount);
             while(data = req.fetch()){
                 Manager.list.push(await new Manager().hydrate(data));
             }
-            console.log('[Man][total]',Manager.list.length);
+            console.log('<Man>[total]',Manager.list.length);
         }catch (e){
             Channel.logError(e);
         }

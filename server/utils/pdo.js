@@ -162,6 +162,7 @@ class PDO {
                         if(err){
                             return rej(err);
                         }
+                        console.log('[pdo][Result]',result.length);
                         res(result);
                     });
                 });
