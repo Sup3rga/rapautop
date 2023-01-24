@@ -8,12 +8,15 @@ class Sys{
             if (await this.get(index) === null) {
                 await Pdo.prepare("insert into sys_pref values(:index, :value)").execute({index,value});
             } else {
-                await Pdo.prepare("update sys_pref set metadata=:index, content=:value").execute({index,value});
+                await Pdo.prepare("update sys_pref set content=:value where metadata=:index").execute({index,value});
             }
         }catch (e){
             return Channel.logError(e).message({code: code.INTERNAL});
         }
-        return Channel.message({code: code.SUCCESS});
+        return Channel.message({
+            error: false,
+            code: code.SUCCESS
+        });
     }
 
     static async get(index){

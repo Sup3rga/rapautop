@@ -1,12 +1,12 @@
 let {
     Articles,Category,Punchlines,
     Messenging, Manager, Subscriber, Pictures,
-    MailingReply
+    MailingReply, Sys, Branch
 } = require('../data/dataPackage');
 const code = require('../utils/ResponseCode'),
     Channel = require('../utils/Channel');
 const Filter = require("../utils/Filter");
-const {is_array,isset,is_file,unlink,toHexa} = require('../utils/procedures');
+const {is_array,isset,is_file,unlink,toHexa,set} = require('../utils/procedures');
 const AkaDatetime = require('../utils/AkaDatetime');
 const fs = require('fs');
 const {promisify} = require('util');
@@ -52,12 +52,17 @@ Wayto.getAllWritingData = async (data)=>{
 }
 
 Wayto.getArticles = async (data)=>{
-    if(!Filter.contains(data, [
-        'artid', ...defaultQuery
-    ])){
+    if(!Filter.contains(data, defaultQuery)){
         return Channel.message({
             error: true,
             code: code.INVALID
+        });
+    }
+    if(!isset(data.artid)){
+        return Channel.message({
+            error: false,
+            code: code.SUCCESS,
+            data: await Articles.fetchAll(data.bhid, true, false)
         });
     }
     const article = await Articles.getById(data.artid);
@@ -591,6 +596,109 @@ Wayto.commitPunchline = async (data)=>{
             years: await Punchlines.fetchYears(data.bhid),
             artists: await Punchlines.fetchArtists(data.bhid)
         }
+    });
+}
+
+Wayto.getEssentialsSettings = async (data)=>{
+    if(!Filter.contains(data, defaultQuery)){
+        return Channel.message({code: code.INVALID});
+    }
+
+    const response = {};
+
+    response.readingVisible = Boolean(set(await Sys.get('readingVisible'+data.bhid), 0) * 1);
+    response.likesVisible = Boolean(set(await Sys.get('likesVisible'+data.bhid), 0) * 1);
+    response.authorVisible = Boolean(set(await Sys.get('authorVisible'+data.bhid), 0) * 1);
+    response.cardWidth = set(await Sys.get('cardWidth'+data.bhid), 400);
+    response.cardHeight = set(await Sys.get('cardHeight'+data.bhid), 400)
+    response.cardBg = set(await Sys.get('cardBg'+data.bhid), '#000');
+    response.cardBandBg =  set(await Sys.get('cardBandBg'+data.bhid),'#fff');
+    response.cardTextColor = set(await Sys.get('cardTextColor'+data.bhid), '#fff');
+    response.cardBandColor = set(await Sys.get('cardBandColor'+data.bhid),'#000');
+    response.branches = await Branch.fetchAll();
+    response.sponsoredArticles = await Articles.fetchAll(data.bhid, true, true);
+    response.sponsoredPunchlines = await Punchlines.fetchAll(data.bhid, true, false, true);
+
+    return Channel.message({
+        error: false,
+        code: code.SUCCESS,
+        data: response
+    });
+}
+
+Wayto.setEssentialsSettings = async (data)=>{
+    if(!Filter.contains(data, defaultQuery)){
+        return Channel.message({code: code.INVALID});
+    }
+    let error = [];
+    let handle = (config, result)=>{
+        if(result.error){
+            error.push({code: result.code, config});
+        }
+    }
+    const manager = await Manager.getById(data.cmid);
+    //visibility setup
+    if(Filter.contains(data, ['readingVisible','likesVisible', 'authorVisible'])){
+        handle('readingVisible',await Sys.set('readingVisible'+data.bhid, data.readingVisible ? 1 : 0));
+        handle('likesVisible',await Sys.set('likesVisible'+data.bhid,data.likesVisible ? 1 : 0));
+        handle('authorVisible',await Sys.set('authorVisible'+data.bhid, data.authorVisible ? 1 : 0));
+    }
+
+    //punchline default settings
+    if(Filter.contains(data, [
+        'cardWidth', 'cardHeight','cardBg','cardBandBg','cardTextColor','cardBandColor'
+    ])){
+        handle('cardWidth',await Sys.set('cardWidth'+data.bhid, data.cardWidth));
+        handle('cardHeight',await Sys.set('cardHeight'+data.bhid, data.cardHeight));
+        handle('cardBg',await Sys.set('cardBg'+data.bhid, data.cardBg));
+        handle('cardBandBg',await Sys.set('cardBandBg'+data.bhid, data.cardBandBg));
+        handle('cardTextColor',await Sys.set('cardTextColor'+data.bhid, data.cardTextColor));
+        handle('cardBandColor',await Sys.set('cardBandColor'+data.bhid, data.cardBandColor));
+    }
+
+    //sponsoring
+    let list = ['sponsoredArticles','sponsoredPunchlines'];
+    if(Filter.contains(data, list)){
+        let sponsor;
+        for(let index of list) {
+            for (let item of data.sponsoredArticles) {
+                sponsor = await (item === list[0] ? Articles : Punchlines).getById(item.id);
+                if (sponsor) {
+                    handle(item.title,await sponsor.sponsorUntil(item.sponsoredUntil));
+                }
+            }
+        }
+    }
+
+    //branch creation/edition
+    if(Filter.contains(data, ['branches'])){
+        let branch, saving;
+        for(let branchData of data.branches){
+            branch = branchData.id ? (await Branch.getById(branchData.id)) : new Branch();
+            if(branch) {
+                branch.name = branchData.name;
+                branch.domain = branchData.domain;
+                if (!branchData.id) {
+                    branch.createdAt = AkaDatetime.now();
+                }
+                saving = await branch[branchData.delete ? 'delete' : 'save']();
+                if(!branchData.delete && !saving.error && !branchData.id){
+                    manager.branches[saving.data.id] = manager.branches[data.bhid];
+                    handle('assignation', await manager.save());
+                }
+                handle(branch.name, saving);
+            }
+            else{
+                handle(branchData.name, Channel.message({code: code.BRANCH_ERROR}))
+            }
+        }
+    }
+
+    return Channel.message({
+        error: false,
+        message: error,
+        code: code.SUCCESS,
+        data: await Wayto.getEssentialsSettings(Filter.object(data, defaultQuery))
     });
 }
 

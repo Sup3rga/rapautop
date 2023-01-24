@@ -24,13 +24,14 @@ class Punchlines extends TracableData{
         this.category = 0;
         this.comment = null;
         this.postOn = null;
+        this.sponsoredUntil = null;
     }
 
     async data(_public = true){
         const data = Filter.object(this, [
             'id','title', 'picture', 'card', 'year', 'artist', 'lyrics', 'punchline',
             'category', 'comment', 'postOn',
-            'createdBy','createdAt','modifiedAt','modifiedBy', 'branch',
+            'createdBy','createdAt','modifiedAt','modifiedBy', 'branch', 'sponsoredUntil'
         ]);
         data.card = (await Pictures.getById(data.card)).data();
         if(!_public) {
@@ -66,6 +67,7 @@ class Punchlines extends TracableData{
         this.modifiedBy = data.modified_by;
         this.modifiedAt = new AkaDatetime(data.modified_at).getDateTime();
         this.postOn = new AkaDatetime(data.post_on).getDateTime();
+        this.sponsoredUntil = !data.sponsored_until ? null : new AkaDatetime(data.sponsored_until).getDateTime();
         return this;
     }
 
@@ -182,6 +184,18 @@ class Punchlines extends TracableData{
         });
     }
 
+    async sponsorUntil(date){
+        date = new AkaDatetime(date);
+        if(!this.id) return Channel.message({code: code.INVALID});
+        try{
+            await Pdo.prepare("update punchlines set sponsored_until=:p1 where id=:p2")
+                .execute({p1: date.getDateTime(), p2: this.id});
+        }catch (e){
+            return Channel.logError(e).message({code: code.INTERNAL});
+        }
+        return Channel.message({code: code.SUCCESS, error: false});
+    }
+
     static async getById(id){
         let punchline = null;
         try{
@@ -195,14 +209,19 @@ class Punchlines extends TracableData{
         return punchline;
     }
 
-    static async fetchAll(branch = 0, dataOnly = true, _public = false){
+    static async fetchAll(branch = 0, dataOnly = true, _public = false, sponsored=false){
         const r = [];
         try{
             const results = await Pdo.prepare("select * from punchlines where branch=:branch")
                 .execute({branch});
             let data;
             while(data = results.fetch()){
-                r.push(await new Punchlines().hydrate(data).data(_public));
+                data = new Punchlines().hydrate(data);
+                if(!sponsored ||
+                    (sponsored && new AkaDatetime(data.sponsoredUntil).isMoreThan(new AkaDatetime()))
+                ){
+                    r.push(dataOnly ? await data.data(_public) : data);
+                }
             }
         }catch (e){
             Channel.logError(e);

@@ -2,7 +2,11 @@ const fs = require("fs");
 const {promisify} = require('util')
 
 function isset(val){
-    return typeof val !== 'undefined';
+    return val != undefined;
+}
+
+function set(val,defaultValue){
+    return isset(val) ? val : defaultValue;
 }
 
 function empty(val){
@@ -101,5 +105,5 @@ function in_array(list = [], element, ignoreCase = false){
 module.exports = {
     isset,empty,time,is_array,base64_decode,
     is_file,rename,unlink,buffer_base64,
-    filter,in_array,toHexa
+    filter,in_array,toHexa,set
 };

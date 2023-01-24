@@ -52,6 +52,10 @@ $bottom-bar-height: 60px;
   }
 }
 
+.wrapper {
+  padding: .5em 0;
+}
+
 #login{
   @include background-image(url(../assets/background.jpg));
   .mask{
@@ -85,7 +89,6 @@ $bottom-bar-height: 60px;
     background-position: center;
   }
   .wrapper{
-    padding: .5em 0;
     .field{
       height: 50px;
     }

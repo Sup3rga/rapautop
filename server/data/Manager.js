@@ -325,12 +325,12 @@ class Manager extends Data{
     }
 
     static async fetchAll(){
-        Manager.list = [];
         try{
             const req = await Pdo.prepare("select distinct  * from manager")
                 .execute();
             // console.trace('[Man][list][ttl]..',Manager.list.length, req.rowCount);
             let data;
+            Manager.list = [];
             console.log('[Before]',req.rowCount);
             while(data = req.fetch()){
                 Manager.list.push(await new Manager().hydrate(data));

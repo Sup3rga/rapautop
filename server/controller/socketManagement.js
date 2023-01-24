@@ -32,7 +32,9 @@ async function manage(socket){
     .transfer('/management/member', '/management/get', Wayto.getManager)
     .transfer('/manager/reset', '/manager/get', Wayto.resetManagerPassword)
     .transfer('/manager/block', '/manager/get', Wayto.blockManager)
-    .transfer('/manager/avatar/set', '/manager/get', Wayto.setManagerAvatar);
+    .transfer('/manager/avatar/set', '/manager/get', Wayto.setManagerAvatar)
+    .transfer('/cog/essentials', '/cog/get', Wayto.getEssentialsSettings)
+    .transfer('/cog/essentials/set', '/cog/get', Wayto.setEssentialsSettings)
 }
 
 function serve(request, response, uploader){

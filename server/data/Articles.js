@@ -160,6 +160,7 @@ class Articles extends Data{
         this.branch = 0;
         this.published = false;
         this.postOn = null;
+        this.sponsoredUntil = null;
     }
 
     async data(){
@@ -167,7 +168,7 @@ class Articles extends Data{
            'id', 'title', 'caption','content',
            'createdAt', 'createdBy', 'modifiedAt',
            'modifiedBy', 'reading', 'likes','dislikes',
-           'category', 'branch', 'postOn','published'
+           'category', 'branch', 'postOn','published', 'sponsoredUntil'
         ]);
         if(data.caption) {
             data.caption = await (await ArticleImage.getById(data.caption)).data();
@@ -288,6 +289,18 @@ class Articles extends Data{
         return Channel.message({error: false, code: code.SUCCESS});
     }
 
+    async sponsorUntil(date){
+        date = new AkaDatetime(date);
+        if(!this.id) return Channel.message({code: code.INVALID});
+        try{
+            await Pdo.prepare("update articles set sponsored_until=:p1 where id=:p2")
+                .execute({p1: date.getDateTime(), p2: this.id});
+        }catch (e){
+            return Channel.logError(e).message({code: code.INTERNAL});
+        }
+        return Channel.message({code: code.SUCCESS, error: false});
+    }
+
     hydrate(data){
         this.id = data.id;
         this.title = data.title;
@@ -305,6 +318,7 @@ class Articles extends Data{
         const postDate = new AkaDatetime(data.post_on);
         this.postOn = postDate.getDateTime();
         this.published = postDate.isLessThan(new AkaDatetime());
+        this.sponsoredUntil = !data.sponsored_until ? null : new AkaDatetime(data.sponsored_until).getDateTime();
         return this;
     }
 
@@ -342,7 +356,7 @@ class Articles extends Data{
         return article;
     }
 
-    static async fetchAll(branch = 0, dataOnly = true){
+    static async fetchAll(branch = 0, dataOnly = true, sponsored = false){
         let result = [];
         try {
             const req = await Pdo.prepare("select * from articles where branch=:branch")
@@ -353,7 +367,12 @@ class Articles extends Data{
                 if(dataOnly){
                     res = await res.data();
                 }
-                result.push(res);
+                if(
+                    !sponsored ||
+                    (sponsored && new AkaDatetime(res.sponsoredUntil).isMoreThan(new AkaDatetime()))
+                ) {
+                    result.push(res);
+                }
             }
         }catch(e){
             Channel.logError(e);

@@ -1,7 +1,7 @@
 let list = [
     'Data','Articles','Branch','Manager','Category','TracableData',
     'Pictures', 'Punchlines', 'Messenging', 'Subscriber',
-    'Mailing', 'MailingReply'
+    'Mailing', 'MailingReply', 'Sys'
 ],
 modules = {};
 for(let i in list) {

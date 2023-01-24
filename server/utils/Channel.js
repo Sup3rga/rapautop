@@ -3,7 +3,7 @@ const code = require('./ResponseCode');
 class Channel {
 
     static message(options={}){
-        let message = typeof options == 'string' ? options : "general error"
+        let message = typeof options == 'string' ? options : null
         let response = {
             error: true,
             code: code.ERROR,
