@@ -20,6 +20,7 @@ async function manage(socket){
     .transfer('/punchlines/category/fetch', "/punchlines/category/get", Wayto.getAllCategories, ['P'])
     .transfer('/punchlines/create', "/punchlines/get", Wayto.commitPunchline)
     .transfer('/punchlines/fetch', "/punchlines/get", Wayto.getPunchlines)
+    .transfer('/punchlines/config/fetch', '/punchlines/config/get', Wayto.getPunchlinesConfig)
     .transfer('/articles', "/articles/get", Wayto.getArticles)
     .transfer('/messages/fetch', '/messages/get', Wayto.getAllMessages)
     .transfer('/message/reply', '/message/get', Wayto.replyMessage)

@@ -109,6 +109,25 @@ Wayto.getPunchlines = async (data)=>{
     });
 }
 
+Wayto.getPunchlinesConfig = async (data)=>{
+    if(!Filter.contains(data, defaultQuery, [null,0,''])){
+        return Channel.message({code: code.INVALID});
+    }
+    console.log('[Config]',data);
+    return Channel.message({
+        error: false,
+        code: code.SUCCESS,
+        data: {
+            cardWidth : set(await Sys.get('cardWidth'+data.bhid), 400) * 1,
+            cardHeight : set(await Sys.get('cardHeight'+data.bhid), 400) * 1,
+            cardBg : set(await Sys.get('cardBg'+data.bhid), '#000'),
+            cardBandBg :  set(await Sys.get('cardBandBg'+data.bhid),'#fff'),
+            cardTextColor : set(await Sys.get('cardTextColor'+data.bhid), '#fff'),
+            cardBandColor : set(await Sys.get('cardBandColor'+data.bhid),'#000')
+        }
+    });
+}
+
 Wayto.receiveMessage = async (data)=>{
     console.log('[Data]',data)
     if(!Filter.contains(data, [
@@ -604,17 +623,16 @@ Wayto.getEssentialsSettings = async (data)=>{
         return Channel.message({code: code.INVALID});
     }
 
-    const response = {};
+    let response = {};
 
     response.readingVisible = Boolean(set(await Sys.get('readingVisible'+data.bhid), 0) * 1);
     response.likesVisible = Boolean(set(await Sys.get('likesVisible'+data.bhid), 0) * 1);
     response.authorVisible = Boolean(set(await Sys.get('authorVisible'+data.bhid), 0) * 1);
-    response.cardWidth = set(await Sys.get('cardWidth'+data.bhid), 400);
-    response.cardHeight = set(await Sys.get('cardHeight'+data.bhid), 400)
-    response.cardBg = set(await Sys.get('cardBg'+data.bhid), '#000');
-    response.cardBandBg =  set(await Sys.get('cardBandBg'+data.bhid),'#fff');
-    response.cardTextColor = set(await Sys.get('cardTextColor'+data.bhid), '#fff');
-    response.cardBandColor = set(await Sys.get('cardBandColor'+data.bhid),'#000');
+    response.readingVisibleWithCondition = Boolean(set(await Sys.get('readingVisibleWithCondition'+data.bhid), 0) * 1);;
+    response.readingVisibilitylimit = set(await Sys.get('readingVisibilitylimit'+data.bhid), 100) * 1;
+    response.likesVisibleWithCondition = Boolean(set(await Sys.get('likesVisibleWithCondition'+data.bhid), 0) * 1);;
+    response.likesVisiblitylimit = set(await Sys.get('likesVisiblitylimit'+data.bhid), 100) * 1;
+    response = {...response, ...(await Wayto.getPunchlinesConfig(data)).data};
     response.branches = await Branch.fetchAll();
     response.sponsoredArticles = await Articles.fetchAll(data.bhid, true, true);
     response.sponsoredPunchlines = await Punchlines.fetchAll(data.bhid, true, false, true);
@@ -638,10 +656,18 @@ Wayto.setEssentialsSettings = async (data)=>{
     }
     const manager = await Manager.getById(data.cmid);
     //visibility setup
-    if(Filter.contains(data, ['readingVisible','likesVisible', 'authorVisible'])){
+    if(Filter.contains(data, [
+        'readingVisible','likesVisible', 'authorVisible',
+        'readingVisibilitylimit', 'likesVisibilitylimit',
+        'readingVisibleWithCondition', 'likesVisibleWithCondition'
+    ])){
         handle('readingVisible',await Sys.set('readingVisible'+data.bhid, data.readingVisible ? 1 : 0));
         handle('likesVisible',await Sys.set('likesVisible'+data.bhid,data.likesVisible ? 1 : 0));
         handle('authorVisible',await Sys.set('authorVisible'+data.bhid, data.authorVisible ? 1 : 0));
+        handle('readingVisibilitylimit',await Sys.set('readingVisibilitylimit'+data.bhid, data.readingVisibilitylimit));
+        handle('likesVisibilitylimit',await Sys.set('likesVisibilitylimit'+data.bhid, data.likesVisibilitylimit));
+        handle('readingVisibleWithCondition',await Sys.set('readingVisibleWithCondition'+data.bhid, data.readingVisibleWithCondition));
+        handle('likesVisibleWithCondition',await Sys.set('likesVisibleWithCondition'+data.bhid, data.likesVisibleWithCondition));
     }
 
     //punchline default settings
