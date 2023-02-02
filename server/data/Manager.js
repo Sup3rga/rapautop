@@ -7,6 +7,7 @@ const code = require('../utils/ResponseCode');
 const {groups,summary} = require('./Privileges');
 const {is_file} = require('../utils/procedures');
 const Pictures = require('./Pictures');
+const {privileges} = require('./Privileges');
 
 class Manager extends Data{
     static list = [];
@@ -34,6 +35,15 @@ class Manager extends Data{
 
     async updateBranchAssignation(){
         let arg;
+        try {
+            await Pdo.prepare(`
+                delete
+                from communauty
+                where manager = :p1
+            `).execute({p1: this.id});
+        }catch (e) {
+            Channel.logError(e);
+        }
         for(let i in this.branches){
             try {
                 arg = {
@@ -56,6 +66,7 @@ class Manager extends Data{
                 Channel.logError(e);
             }
         }
+        this.setLevels();
     }
 
     async save(){
@@ -79,6 +90,7 @@ class Manager extends Data{
          */
 
         if(this.createdBy === this.id) this.createdBy = null;
+        let _new = false;
 
         try{
             const base = {
@@ -101,10 +113,9 @@ class Manager extends Data{
                 `).execute(base);
                 current = await Manager.getLast(this);
                 this.id = current.id;
-                Manager.list.push(current);
+                _new = true;
             }
             else{
-                console.log('[Base]',base);
                 base.p10 = this.id;
                 await Pdo.prepare(`
                     update manager set
@@ -118,6 +129,9 @@ class Manager extends Data{
             return Channel.logError(e).message({code: code.INTERNAL});
         }
         await this.updateBranchAssignation();
+        if(_new){
+            Manager.list.push(this);
+        }
         return Channel.message({
             error: false,
             code: code.SUCCESS,
@@ -144,21 +158,10 @@ class Manager extends Data{
         return this;
     }
 
-    async fetchBranch(){
-        let result = await Connect.query("select distinct b.id, b.domain, b.name, c.access from communauty c, branch b where c.manager=? and c.branch=b.id",[
-            this.id
-        ]);
-        if(result.length){
-            for(let i in result){
-                this.branches[result[i].id] = result[i].access.split(',');
-                this.branchesData[result[i].id] = {
-                    id: result[i].id,
-                    name: result[i].name,
-                    domain: result[i].domain
-                };
-            }
-        }
+    setLevels(){
         let levels;
+        this.status = {};
+        this.level = {};
         for(let i in this.branches){
             this.status[i] = [];
             levels = {};
@@ -183,6 +186,23 @@ class Manager extends Data{
             }
             this.level[i] = levels;
         }
+    }
+
+    async fetchBranch(){
+        let result = await Connect.query("select distinct b.id, b.domain, b.name, c.access from communauty c, branch b where c.manager=? and c.branch=b.id",[
+            this.id
+        ]);
+        if(result.length){
+            for(let i in result){
+                this.branches[result[i].id] = result[i].access.split(',');
+                this.branchesData[result[i].id] = {
+                    id: result[i].id,
+                    name: result[i].name,
+                    domain: result[i].domain
+                };
+            }
+        }
+        this.setLevels();
     }
 
     async data(publicMode = true, personal= false, essentials=false){
@@ -210,25 +230,31 @@ class Manager extends Data{
         return data;
     }
 
-    async checkConnection(){
+    async checkConnection(token = null){
         let online = null;
 
         if(!this.saved) return online;
+        const arg = {p1: this.id};
+        if(token) arg.p2 = token;
+        let req = await Pdo.prepare(`
+            select last_seen, token
+            from session_trace
+            where
+                client=:p1
+                ${token ? 'and token=:p2' : ''}
+        `).execute(arg);
 
-        let data = await Connect.query("select last_seen, token from session_trace where client=?",[
-            this.id
-        ]);
-
-        if(data.length){
-            let date,
+        if(req.rowCount){
+            let date, data,
                 diff,
                 timeout = new AkaDatetime("00:15:00"),
-                now = new AkaDatetime(new Date());
-            for(let i in data){
-                date = new AkaDatetime(data[i].last_seen);
+                now = new AkaDatetime();
+            while(data = req.fetch()){
+                date = new AkaDatetime(data.last_seen);
                 diff = AkaDatetime.diff(now, date);
+                console.log('[Diff]',diff.getDateTime(),diff.isLessThan(timeout))
                 if(diff.isLessThan(timeout)){
-                    online = data[i].token;
+                    online = data.token;
                     break;
                 }
             }
@@ -240,27 +266,37 @@ class Manager extends Data{
     async setSession(){
         if(!this.saved) return;
         let onlineToken = await this.checkConnection();
-        if(onlineToken){
-           await Connect.query("update session_trace set last_seen=?",[
-               new AkaDatetime(new Date()).getDateTime()
-           ]);
-        }
-        else{
-            let date = new Date(),
-                now = new AkaDatetime(date).getDateTime();
-            try {
-                await Connect.query("insert into session_trace (client, token, created_at, last_seen) values(?,SHA1(?),?,?)", [
-                    this.id,
-                    date,
-                    now,
-                    now
-                ]);
+        try {
+            if (onlineToken) {
+                await Pdo.prepare(`
+                    update session_trace set last_seen=:p1 where client=:p2
+                `).execute({
+                    p1: new AkaDatetime().getDateTime(),
+                    p2: this.id
+                });
+
+                await Pdo.prepare(`
+                    delete from session_trace 
+                    where 
+                          (last_seen + INTERVAL 15 MINUTE) < NOW() and
+                          client=:p1
+                `).execute({p1: this.id});
+            } else {
+                let now = new AkaDatetime().getDateTime();
+                await Pdo.prepare(`
+                    insert into session_trace (client, token, created_at, last_seen) 
+                    values(:p1,SHA1(:p2),:p2, :p2)
+                `).execute({
+                    p1: this.id,
+                    p2: now
+                });
                 onlineToken = await this.checkConnection();
-            }catch (e){
-                return;
             }
+        }catch (e) {
+            Channel.logError(e);
         }
         this.token = onlineToken;
+        return this;
     }
 
     setOnline(){
@@ -315,6 +351,35 @@ class Manager extends Data{
         }
     }
 
+    hasAccess(privilege, branch){
+        privilege = Array.isArray(privilege) ? privilege : [privilege];
+        if (!(branch in this.branches)) {
+            return false;
+        }
+        let response = true, found = false;
+        for(let number of privilege) {
+            if (!(number in privileges)) {
+                return false;
+            }
+            found = false;
+            for (let privilege of this.branches[branch]) {
+                if (privilege == number) {
+                    found = true;
+                }
+            }
+            response = response && found;
+        }
+        return response;
+    }
+
+    async isAuthentified(token){
+        const response = await this.checkConnection(token) !== null;
+        if(response){
+            await this.setSession();
+        }
+        return response;
+    }
+
     static async getById(id){
         for(let i in Manager.list){
             if(Manager.list[i].id == id){
@@ -335,7 +400,6 @@ class Manager extends Data{
             while(data = req.fetch()){
                 Manager.list.push(await new Manager().hydrate(data));
             }
-            console.log('<Man>[total]',Manager.list.length);
         }catch (e){
             Channel.logError(e);
         }
@@ -373,7 +437,7 @@ class Manager extends Data{
       if(!man.active){
           return Channel.message({code: code.DENIED_ACCESS});
       }
-       await man.setOnline().setSession();
+       await(await man.setSession()).setOnline();
        return Channel.message({
            error: false,
            message: "Success",
@@ -417,8 +481,16 @@ class Manager extends Data{
                 list.push(onlyData ? await Manager.list[i].data() : Manager.list[i]);
             }
         }
-        console.log('[Man][items]',list.length, '/', Manager.list.length)
+        console.log('[Man][items..]',list.length, '/', Manager.list.length)
         return list;
+    }
+
+    static async checkAuthentification(id,token){
+        const manager = await Manager.getById(id);
+        if(manager){
+            return await manager.isAuthentified(token);
+        }
+        return false;
     }
 }
 

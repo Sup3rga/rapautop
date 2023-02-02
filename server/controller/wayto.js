@@ -33,6 +33,10 @@ Wayto.connect = async (data)=>{
 }
 
 Wayto.getAllCategories = async (data, sector='A')=>{
+    if(!Filter.contains(data, defaultQuery, [null,0,''])){
+        return Channel.message({code: code.INVALID});
+    }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) return Channel.message({code: code.LOGOUT})
     return Channel.message({
         error: false,
         code: code.SUCCESS,
@@ -41,6 +45,12 @@ Wayto.getAllCategories = async (data, sector='A')=>{
 }
 
 Wayto.getAllWritingData = async (data)=>{
+    if(!Filter.contains(data, defaultQuery, [null,0,''])){
+        return Channel.message({code: code.INVALID});
+    }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
     return Channel.message({
         error: false,
         code : code.SUCCESS,
@@ -57,6 +67,9 @@ Wayto.getArticles = async (data)=>{
             error: true,
             code: code.INVALID
         });
+    }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
     }
     if(!isset(data.artid)){
         return Channel.message({
@@ -80,6 +93,12 @@ Wayto.getArticles = async (data)=>{
 }
 
 Wayto.getLogo = async (data)=>{
+    if(!Filter.contains(data, defaultQuery, [null,0,''])){
+        return Channel.message({code: code.INVALID});
+    }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
     try {
         const data = await promisify(fs.readFile)('../public/assets/white-logo.jpg');
         // console.log('[logo...]',data);
@@ -98,6 +117,9 @@ Wayto.getPunchlines = async (data)=>{
     if(!Filter.contains(data, defaultQuery, [null,0,''])){
         return Channel.message({code: code.INVALID});
     }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
     return Channel.message({
         error: false,
         code : code.SUCCESS,
@@ -113,7 +135,10 @@ Wayto.getPunchlinesConfig = async (data)=>{
     if(!Filter.contains(data, defaultQuery, [null,0,''])){
         return Channel.message({code: code.INVALID});
     }
-    console.log('[Config]',data);
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
+    // console.log('[Config]',data);
     return Channel.message({
         error: false,
         code: code.SUCCESS,
@@ -129,11 +154,13 @@ Wayto.getPunchlinesConfig = async (data)=>{
 }
 
 Wayto.receiveMessage = async (data)=>{
-    console.log('[Data]',data)
     if(!Filter.contains(data, [
         'cli_fname', 'cli_lname', 'cli_mail', 'cli_msg','cli_bhid'
     ])){
         return Channel.message({code: code.INVALID});
+    }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
     }
     let client = await Subscriber.getByEmail(data.cli_mail),
         saving;
@@ -169,6 +196,14 @@ Wayto.readMessage = async (data, passBy = false) => {
     if(!passBy && !Filter.contains(data, [...defaultQuery, 'msgid'])){
         return Channel.message({code: code.INVALID});
     }
+    if(!passBy && !(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
+
+    const manager = await Manager.getById(data.cmid);
+    if(!manager) return Channel.message({code: code.DENIED_ACCESS});
+    if(!manager.hasAccess(200, data.bhid)) return Channel.message({code: code.INSUFFICIENT_PRIVILEGE});
+
     let result = await Messenging.getById(data.msgid);
     if(result){
         if(!result.readBy){
@@ -188,10 +223,17 @@ Wayto.readMessage = async (data, passBy = false) => {
 }
 
 Wayto.getAllMessages = async (data)=>{
-    console.log('[messages]',data);
     if(!Filter.contains(data, defaultQuery)){
         return Channel.message({code: code.INVALID});
     }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
+
+    const manager = await Manager.getById(data.cmid);
+    if(!manager) return Channel.message({code: code.DENIED_ACCESS});
+    if(!manager.hasAccess(200, data.bhid)) return Channel.message({code: code.INSUFFICIENT_PRIVILEGE});
+
     let result = null;
     if('msgid' in data){
         result = await Wayto.readMessage(data,true);
@@ -214,6 +256,13 @@ Wayto.replyMessage = async (data)=>{
     ], [null, 0, ''])){
         return Channel.message({code: code.INVALID});
     }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
+    const manager = await Manager.getById(data.cmid);
+    if(!manager) return Channel.message({code: code.DENIED_ACCESS});
+    if(!manager.hasAccess(201, data.bhid)) return Channel.message({code: code.INSUFFICIENT_PRIVILEGE});
+
     let message = await Messenging.getById(data.msgid);
     const reply = new MailingReply();
     reply.client = message.client;
@@ -240,6 +289,13 @@ Wayto.deleteMessage = async (data)=>{
     ], [null, 0, ''])){
         return Channel.message({code: code.INVALID});
     }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
+    const manager = await Manager.getById(data.cmid);
+    if(!manager) return Channel.message({code: code.DENIED_ACCESS});
+    if(!manager.hasAccess(202, data.bhid)) return Channel.message({code: code.INSUFFICIENT_PRIVILEGE});
+
     let message = await Messenging.getById(data.delid);
     let saving = await message.delete();
     return saving;
@@ -295,7 +351,6 @@ Wayto.uploadMailImage = async (data,ths)=>{
 Wayto.uploadAvatar = async (data,ths)=>{
     let {avatar = []} = data,
         image = '';
-    console.log('[Uploading]...');
     for(let i in avatar){
         if(await ths.isUploaded(avatar[i])){
             const dest = toHexa(Pictures.baseName(avatar[i]))+'.' + Pictures.extension(avatar[i]);
@@ -309,9 +364,11 @@ Wayto.uploadAvatar = async (data,ths)=>{
 }
 
 Wayto.getPrivileges = async (data)=>{
-    console.log('[Received]',data);
     if(!Filter.contains(data, defaultQuery)){
         return Channel.message({code: code.INVALID});
+    }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
     }
     return Channel.message({
         error: false,
@@ -348,7 +405,13 @@ Wayto.integrateNewManager = async (data)=>{
     ], [null, '',0])){
         return Channel.message({code: code.INVALID});
     }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
 
+    let manager = await Manager.getById(data.cmid);
+    if(!manager) return Channel.message({code: code.DENIED_ACCESS});
+    if(!manager.hasAccess(400, data.bhid)) return Channel.message({code: code.INSUFFICIENT_PRIVILEGE});
 
     const auth = await Manager.connect(data.cmid, data.auth);
     if(auth.error) return auth;
@@ -356,12 +419,14 @@ Wayto.integrateNewManager = async (data)=>{
     const update = 'id' in data;
     const selfRequest = update && data.id == data.cmid;
 
+    if(update && !selfRequest && !manager.hasAccess(402, data.bhid)) return Channel.message({code: code.INSUFFICIENT_PRIVILEGE});
+
 
     if(!update && (!isset(data.password) || !isset(data.privileges)) ){
         return Channel.message({code: code.INVALID});
     }
 
-    const manager = update ? await Manager.getById(data.id) : new Manager();
+    manager = update ? await Manager.getById(data.id) : new Manager();
 
     if(!manager) return Channel.message({code: code.INVALID});
 
@@ -390,11 +455,18 @@ Wayto.resetManagerPassword = async (data)=>{
     if(!Filter.contains(data, [...defaultQuery, 'psw', 'auth', 'manid'])){
         return Channel.message({code:code.INVALID});
     }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
+
+    let manager = await Manager.getById(data.cmid);
+    if(!manager) return Channel.message({code: code.DENIED_ACCESS});
+    if(!manager.hasAccess(401, data.bhid)) return Channel.message({code: code.INSUFFICIENT_PRIVILEGE});
 
     const auth = await Manager.connect(data.cmid, data.auth);
     if(auth.error) return auth;
 
-    const manager = await Manager.getById(data.manid);
+    manager = await Manager.getById(data.manid);
 
     if(!manager) return Channel.message({code: code.INVALID});
 
@@ -407,11 +479,18 @@ Wayto.blockManager = async (data)=>{
     if(!Filter.contains(data, [...defaultQuery, 'block', 'auth', 'manid'])){
         return Channel.message({code:code.INVALID});
     }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
+
+    let manager = await Manager.getById(data.cmid);
+    if(!manager) return Channel.message({code: code.DENIED_ACCESS});
+    if(!manager.hasAccess(408, data.bhid)) return Channel.message({code: code.INSUFFICIENT_PRIVILEGE});
 
     const auth = await Manager.connect(data.cmid, data.auth);
     if(auth.error) return auth;
 
-    const manager = await Manager.getById(data.manid);
+    manager = await Manager.getById(data.manid);
 
     if(!manager) return Channel.message({code: code.INVALID});
 
@@ -421,9 +500,14 @@ Wayto.blockManager = async (data)=>{
 }
 
 Wayto.getAllManagers = async (data)=>{
+    console.log('[Data]',data);
     if(!Filter.contains(data, defaultQuery)){
         return Channel.message({code: code.INVALID});
     }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
+
     return Channel.message({
         code: code.SUCCESS,
         error: false,
@@ -435,6 +519,10 @@ Wayto.getManager = async (data)=>{
     if(!Filter.contains(data, [...defaultQuery, 'manid'])){
         return Channel.message({code: code.INVALID});
     }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
+
     const manager = await Manager.getById(data.manid);
 
     if(!manager) return Channel.message({code: code.INVALID});
@@ -450,6 +538,10 @@ Wayto.setManagerAvatar = async (data)=>{
     if(!Filter.contains(data, [...defaultQuery, 'res'])){
         return Channel.message({code: code.INVALID});
     }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
+
     const manager = await Manager.getById(data.cmid);
 
     if(!manager) return Channel.message({code: code.INVALID});
@@ -458,6 +550,17 @@ Wayto.setManagerAvatar = async (data)=>{
 }
 
 Wayto.commitCategories = async (data, sector)=>{
+    if(!Filter.contains(data, [...defaultQuery, 'save', 'del'])){
+        return Channel.message({code:code.INVALID});
+    }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
+
+    // let manager = await Manager.getById(data.cmid);
+    // if(!manager) return Channel.message({code: code.DENIED_ACCESS});
+    // if(!manager.hasAccess(408, data.bhid)) return Channel.message({code: code.INSUFFICIENT_PRIVILEGE});
+
     let message = [],
         save = data.save,
         category, update;
@@ -509,53 +612,54 @@ Wayto.commitCategories = async (data, sector)=>{
 }
 
 Wayto.commitRedaction = async (data)=>{
-    if(Filter.contains(data, [ ...defaultQuery,
+    if(!Filter.contains(data, [ ...defaultQuery,
         'title','content', 'img', 'category',
         'schdate'
     ])){
-
-        const update = 'id' in data;
-        let article = update ? await Articles.getById(data.id) : new Articles();
-        // console.log('[UPDATE]',article);
-        article.title = data.title;
-        article.content = data.content;
-        article.category = data.category;
-        if(is_array(data.img)){
-            article.pictures = data.img;
-        }
-        if(!update){
-            article.createdAt = new Date();
-            article.createdBy = data.cmid;
-            article.branch = data.bhid;
-        }
-        else {
-            if(data.bhid !== article.branch){
-                return Channel.message({
-                    code: code.INVALID
-                });
-            }
-            article.modifiedAt = new Date();
-            article.modifiedBy = data.cmid;
-        }
-        if(
-            update &&
-            isset(data.schdate) && AkaDatetime.isDateTime(data.schdate) &&
-            !article.published
-        ){
-            console.log('[Set Date]',data.schdate);
-            article.postOn = data.schdate;
-        }
-        else if(!update){
-            article.postOn = new Date();
-        }
-        let message = await article.save();
-        return message;
-    }
-    else {
         return Channel.message({
             code: code.INVALID
         });
     }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
+
+    const update = 'id' in data;
+    let article = update ? await Articles.getById(data.id) : new Articles();
+    // console.log('[UPDATE]',article);
+    article.title = data.title;
+    article.content = data.content;
+    article.category = data.category;
+    if(is_array(data.img)){
+        article.pictures = data.img;
+    }
+    if(!update){
+        article.createdAt = new Date();
+        article.createdBy = data.cmid;
+        article.branch = data.bhid;
+    }
+    else {
+        if(data.bhid !== article.branch){
+            return Channel.message({
+                code: code.INVALID
+            });
+        }
+        article.modifiedAt = new Date();
+        article.modifiedBy = data.cmid;
+    }
+    if(
+        update &&
+        isset(data.schdate) && AkaDatetime.isDateTime(data.schdate) &&
+        !article.published
+    ){
+        console.log('[Set Date]',data.schdate);
+        article.postOn = data.schdate;
+    }
+    else if(!update){
+        article.postOn = new Date();
+    }
+    let message = await article.save();
+    return message;
 }
 
 Wayto.commitPunchline = async (data)=>{
@@ -566,6 +670,10 @@ Wayto.commitPunchline = async (data)=>{
     ], [null,0,''])){
         return Channel.message({code: code.INVALID});
     }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
+
     const update = 'id' in data;
     const punchline = update ? await Punchlines.getById(data.id) : new Punchlines();
     if(!punchline || !is_array(data.res) || (!update && data.res.length < 2)){
@@ -622,6 +730,9 @@ Wayto.getEssentialsSettings = async (data)=>{
     if(!Filter.contains(data, defaultQuery)){
         return Channel.message({code: code.INVALID});
     }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
 
     let response = {};
 
@@ -634,7 +745,7 @@ Wayto.getEssentialsSettings = async (data)=>{
     response.likesVisiblitylimit = set(await Sys.get('likesVisiblitylimit'+data.bhid), 100) * 1;
     response = {...response, ...(await Wayto.getPunchlinesConfig(data)).data};
     response.branches = await Branch.fetchAll();
-    response.sponsoredArticles = await Articles.fetchAll(data.bhid, true, true);
+    response.sponsoredArticles = await Articles.getSponsored(data.bhid, true);
     response.sponsoredPunchlines = await Punchlines.fetchAll(data.bhid, true, false, true);
 
     return Channel.message({
@@ -648,6 +759,10 @@ Wayto.setEssentialsSettings = async (data)=>{
     if(!Filter.contains(data, defaultQuery)){
         return Channel.message({code: code.INVALID});
     }
+    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+        return Channel.message({code: code.LOGOUT})
+    }
+
     let error = [];
     let handle = (config, result)=>{
         if(result.error){

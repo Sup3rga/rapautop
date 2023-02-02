@@ -7,7 +7,9 @@ let {Pdo} = require('../utils/Connect'),
     Category = require('./Category'),
     AkaDatetime = require('../utils/AkaDatetime'),
     code = require('../utils/ResponseCode'),
-    {filter} = require('../utils/procedures');
+    {filter,set} = require('../utils/procedures'),
+    Sys = require('./Sys');
+const SponsoredData = require("./SponsoredData");
 
 class ArticleImage extends Data{
     constructor() {
@@ -139,7 +141,7 @@ class ArticleImage extends Data{
     }
 }
 
-class Articles extends Data{
+class Articles extends SponsoredData{
     static list = [];
 
     constructor() {
@@ -378,6 +380,17 @@ class Articles extends Data{
             Channel.logError(e);
         }
         return result;
+    }
+
+    static async getSponsored(branch, dataOnly = true, forPublic = false){
+        return super.getSponsored(
+            Articles,
+            'articles',
+            set(await Sys.get("sponsoredArticleMinQty"+branch), 5) * 1,
+            branch,
+            dataOnly,
+            forPublic
+        );
     }
 }
 
