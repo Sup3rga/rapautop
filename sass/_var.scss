@@ -69,5 +69,26 @@ $background2: #12172d;
     &.ck-widget-image-style-side{
       width: 50%;
     }
+    img{
+      width: 100%;
+    }
+    figcaption{
+      width: 100%;
+      caption-side: bottom;
+      display: block;
+      font-size: .75em;
+      outline-offset: -1px;
+      padding: 0.6em;
+      word-break: break-word;
+    }
+  }
+  blockquote{
+    border-left: 5px solid $background2;
+    font-style: italic;
+    margin-left: 0;
+    margin-right: 0;
+    overflow: hidden;
+    padding-left: 1.5em;
+    padding-right: 1.5em;
   }
 }

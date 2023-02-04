@@ -53,19 +53,34 @@ class PDO {
         this.sqlString = '';
         this.driver = options.driver;
         this.connected = false;
+        this._options = config;
+        this.retryConnection();
         this.logError = null;
-        const timer = setInterval((e)=>{
-            try{
-                this.setDriver(config);
-                this.connected = true;
-            }catch (e){
-                this.logError = e;
-            }
-        }, 300);
         this.results = {};
         this.queue = [];
         this.cursor = 0;
         this.rowCount = 0;
+    }
+
+    async retryConnection(){
+        const $this = this;
+        return new Promise((res)=>{
+            if($this.db) {
+                return res();
+            }
+            const timer = setInterval((e)=>{
+                try{
+                    $this.setDriver($this._options);
+                    $this.connected = true;
+                    if($this.db) {
+                        clearInterval(timer);
+                        res();
+                    }
+                }catch (e){
+                    $this.logError = e;
+                }
+            }, 300);
+        });
     }
 
     setDriver(options){
@@ -157,12 +172,15 @@ class PDO {
         }
         if(this.driver == 'mysql'){
             let results = await (($this)=>{
-                return new Promise((res,rej)=>{
+                return new Promise(async (res,rej)=>{
+                    if(!$this.db){
+                        await $this.retryConnection();
+                    }
                     $this.db.query(finalSql, null, function (err, result){
                         if(err){
                             return rej(err);
                         }
-                        console.log('[pdo][Result]',result.length);
+                        // console.log('[pdo][Result]',result);
                         res(result);
                     });
                 });

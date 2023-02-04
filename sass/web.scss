@@ -470,6 +470,9 @@ footer{
 #see-more-article{
   font-family: Lexend-Bold;
 }
+.article-reader{
+  @extend %article-reading-view;
+}
 
 //Contact-us
 .contact-us{

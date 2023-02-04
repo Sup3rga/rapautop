@@ -165,19 +165,21 @@ class Articles extends SponsoredData{
         this.sponsoredUntil = null;
     }
 
-    async data(){
+    async data(_public = false){
         const data = Filter.object(this, [
            'id', 'title', 'caption','content',
-           'createdAt', 'createdBy', 'modifiedAt',
-           'modifiedBy', 'reading', 'likes','dislikes',
-           'category', 'branch', 'postOn','published', 'sponsoredUntil'
+           'createdBy', 'reading', 'likes','dislikes',
+           'category', 'branch', 'postOn',
+            ...(_public ? [] : ['modifiedAt','modifiedBy','published','createdAt','sponsoredUntil'])
         ]);
         if(data.caption) {
             data.caption = await (await ArticleImage.getById(data.caption)).data();
             data.caption = data.caption.path;
         }
         data.createdBy = await (await Manager.getById(data.createdBy)).data(true, false, true);
-        data.modifiedBy = await (await Manager.getById(data.modifiedBy)).data(true, false, true);
+        if(!_public) {
+            data.modifiedBy = await (await Manager.getById(data.modifiedBy)).data(true, false, true);
+        }
         data.category = await (await Category.getById(data.category)).data();
         data.category = Filter.object(data.category, ['id', 'name', 'sector']);
         return data;
@@ -358,16 +360,16 @@ class Articles extends SponsoredData{
         return article;
     }
 
-    static async fetchAll(branch = 0, dataOnly = true, sponsored = false){
+    static async fetchAll(branch = 0, dataOnly = true, sponsored = false, _public = false){
         let result = [];
         try {
-            const req = await Pdo.prepare("select * from articles where branch=:branch")
+            const req = await Pdo.prepare("select * from articles where branch=:branch order by id desc")
                 .execute({branch});
             let data, res;
             while(data = req.fetch()){
                 res = new Articles().hydrate(data);
                 if(dataOnly){
-                    res = await res.data();
+                    res = await res.data(_public);
                 }
                 if(
                     !sponsored ||

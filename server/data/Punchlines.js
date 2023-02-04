@@ -29,9 +29,10 @@ class Punchlines extends TracableData{
 
     async data(_public = true){
         const data = Filter.object(this, [
-            'id','title', 'picture', 'card', 'year', 'artist', 'lyrics', 'punchline',
+            'id','title','card', 'year', 'artist', 'lyrics', 'punchline',
             'category', 'comment', 'postOn',
-            'createdBy','createdAt','modifiedAt','modifiedBy', 'branch', 'sponsoredUntil'
+            'createdBy', 'branch', 'sponsoredUntil',
+            ...(_public ? [] : ['createdAt','modifiedAt','modifiedBy','picture',])
         ]);
         data.card = (await Pictures.getById(data.card)).data();
         if(!_public) {
@@ -212,7 +213,7 @@ class Punchlines extends TracableData{
     static async fetchAll(branch = 0, dataOnly = true, _public = false, sponsored=false){
         const r = [];
         try{
-            const results = await Pdo.prepare("select * from punchlines where branch=:branch")
+            const results = await Pdo.prepare("select * from punchlines where branch=:branch order by id desc")
                 .execute({branch});
             let data;
             while(data = results.fetch()){

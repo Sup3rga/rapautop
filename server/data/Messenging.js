@@ -52,7 +52,8 @@ class Messenging extends Data{
         }
         return Channel.message({
             error: false,
-            code: code.SUCCESS
+            code: code.SUCCESS,
+            data: await Messenging.getLast(this)
         });
     }
 
@@ -123,12 +124,32 @@ class Messenging extends Data{
         return message;
     }
 
+    static async getLast(src=null){
+        let message = null,
+            queue = "",
+            arg = {};
+        if(src){
+            queue = 'where post_on=:p2';
+            arg = {p2: new AkaDatetime(src.postOn).getDateTime()};
+        }
+        try{
+            const req = await Pdo.prepare("select * from messenging "+queue+" order by id desc LIMIT 1")
+                .execute(arg);
+            if(req.rowCount){
+                message = new Messenging().hydrate(req.fetch());
+            }
+        }catch(e){
+            Channel.logError(e);
+        }
+        return message;
+    }
+
     static async fetchAll(branch, onlyData = true, _public = false){
         const list = [];
         try{
             const request = await Pdo.prepare(`
                     select distinct m.* from messenging m, subscriber s
-                    where s.branch = :branch
+                    where s.branch = :branch order by id desc
                 `).execute({branch});
             let data;
             while(data = request.fetch()){

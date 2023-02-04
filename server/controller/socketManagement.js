@@ -9,7 +9,9 @@ async function manage(socket){
     .transfer(null, 'connected',null)
     .transfer('disconnecting', ()=>{
         console.log('disconnected');
+        Wayto.unlinkDisconnectedSocket(socket);
     })
+    .transfer('/connect', '/connect/report', Wayto.bindUser)
     .transfer('/writing/write', '/writing/write/response', Wayto.commitRedaction)
     .transfer('/writing/category/fetch', '/writing/category/get', Wayto.getAllCategories)
     .transfer('/writing', '/writing/data', Wayto.getAllWritingData)
@@ -46,6 +48,8 @@ function serve(request, response, uploader){
     .serve(['pch_img'], Wayto.uploadPunchlineImage, [uploader])
     .serve(['upl_mailimg'], Wayto.uploadMailImage, [uploader])
     .serve(['avatar'], Wayto.uploadAvatar, [uploader])
+    .serve(['articles', 'bhid'], Wayto.getArticles, [false])
+    .serve(['punchlines', 'bhid'], Wayto.getSitePunchlines)
     .notFound();
 }
 

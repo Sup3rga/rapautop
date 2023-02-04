@@ -1,5 +1,5 @@
 let {Connect,Channel, Pdo} = require('../utils/Connect'),
-    Data = require('./Data'),
+    SocketableData = require('./SocketableData'),
     AkaDatetime = require('../utils/AkaDatetime'),
     Filter = require('../utils/Filter');
 const {promisify} = require('util');
@@ -8,8 +8,9 @@ const {groups,summary} = require('./Privileges');
 const {is_file} = require('../utils/procedures');
 const Pictures = require('./Pictures');
 const {privileges} = require('./Privileges');
+const Branch = require('./Branch');
 
-class Manager extends Data{
+class Manager extends SocketableData{
     static list = [];
     static connected = [];
 
@@ -31,6 +32,7 @@ class Manager extends Data{
         this.status = {};
         this.level = {};
         this.branchesData = {};
+        this.timer = null;
     }
 
     async updateBranchAssignation(){
@@ -67,6 +69,29 @@ class Manager extends Data{
             }
         }
         this.setLevels();
+    }
+
+    static searchAndRemoveSocket(socket){
+        for(let manager of Manager.list){
+            manager.unlinkSocket(socket);
+        }
+    }
+
+    /**
+     *
+     * @param destination <p>The path/canal to set the broadcast</p>
+     * @param data <p>The data to pass for the broadcast</p>
+     * @param branches <p>allow to define a broadcast concerning some branch</p>
+     * @param exception <p>allow to avoide a user to include in broadcast</p>
+     */
+    static broadcast(destination, data, branches=[], exception = null){
+        for(let manager of Manager.list){
+            if(manager !== exception){
+                for(let socket of manager.sockets){
+                    socket.emit(destination, data);
+                }
+            }
+        }
     }
 
     async save(){
@@ -129,13 +154,17 @@ class Manager extends Data{
             return Channel.logError(e).message({code: code.INTERNAL});
         }
         await this.updateBranchAssignation();
+        const data = await this.data();
         if(_new){
             Manager.list.push(this);
+        }
+        else{
+            Manager.broadcast('/user-update', data, Object.keys(this.branches));
         }
         return Channel.message({
             error: false,
             code: code.SUCCESS,
-            data: await current.data()
+            data: data
         });
     }
 
@@ -211,7 +240,7 @@ class Manager extends Data{
             list = [ ...list,
                 'mail', 'nickname', 'status', 'level',
                 'phone', 'createdAt', 'createdBy', 'active',
-                'branches', 'branchesData'
+                'branches'
             ];
         }
         if(personal){
@@ -231,17 +260,15 @@ class Manager extends Data{
     }
 
     async checkConnection(token = null){
-        let online = null;
+        let online = null, old = [];
 
         if(!this.saved) return online;
         const arg = {p1: this.id};
-        if(token) arg.p2 = token;
         let req = await Pdo.prepare(`
             select last_seen, token
             from session_trace
             where
                 client=:p1
-                ${token ? 'and token=:p2' : ''}
         `).execute(arg);
 
         if(req.rowCount){
@@ -252,15 +279,44 @@ class Manager extends Data{
             while(data = req.fetch()){
                 date = new AkaDatetime(data.last_seen);
                 diff = AkaDatetime.diff(now, date);
-                console.log('[Diff]',diff.getDateTime(),diff.isLessThan(timeout))
+                // console.log('[Diff]',diff.getDateTime(),diff.isLessThan(timeout))
                 if(diff.isLessThan(timeout)){
                     online = data.token;
-                    break;
+                    if(!token) {
+                        break;
+                    }
+                }
+                else{
+                    old.push(data.token);
+                }
+            }
+            for(let token of old){
+                try {
+                    await Pdo.prepare(`
+                        delete
+                        from session_trace
+                        where token = :p1
+                          and client = :p2
+                    `).execute({
+                        p1: token,
+                        p2: this.id
+                    });
+                }catch (e){
+                    Channel.logError(e);
                 }
             }
         }
 
         return online;
+    }
+
+    waitForExpiration(){
+        clearTimeout(this.timer);
+        this.timer = setTimeout(()=>{
+            for(let socket of this.sockets){
+                socket.emit('/session-expiration');
+            }
+        }, 15 * 60000);
     }
 
     async setSession(){
@@ -292,6 +348,7 @@ class Manager extends Data{
                 });
                 onlineToken = await this.checkConnection();
             }
+            this.waitForExpiration();
         }catch (e) {
             Channel.logError(e);
         }
@@ -380,6 +437,11 @@ class Manager extends Data{
         return response;
     }
 
+    /**
+     *
+     * @param id
+     * @returns {Promise<null|Manager>}
+     */
     static async getById(id){
         for(let i in Manager.list){
             if(Manager.list[i].id == id){
@@ -441,7 +503,10 @@ class Manager extends Data{
        return Channel.message({
            error: false,
            message: "Success",
-           data: await man.data(true, true)
+           data: {
+               ...(await man.data(true, true)),
+               branchesData: await Branch.fetchAll(true)
+           }
        });
     }
 

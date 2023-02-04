@@ -25,6 +25,28 @@ Wayto.startManagement = async () =>{
     }
 }
 
+Wayto.unlinkDisconnectedSocket = (socket)=>{
+    Manager.searchAndRemoveSocket(socket);
+}
+
+Wayto.bindUser = async (data, socket)=>{
+    if(!Filter.contains(data, defaultQuery, [null,0,''])){
+        return Channel.message({code: code.INVALID});
+    }
+    const manager = await Manager.getById(data.cmid);
+    if(!manager){
+        return Channel.message({code: code.DENIED_ACCESS});
+    }
+    manager.attachSocket(socket);
+    if(!manager.isAuthentified(data.cmtk)){
+        return Channel.message({code: code.LOGOUT});
+    }
+    return Channel.message({
+        error: false,
+        code: code.SUCCESS
+    })
+}
+
 Wayto.connect = async (data)=>{
     if(!Filter.contains(data, ['identifier', 'code'])){
         return Channel.message({code: code.INVALID});
@@ -61,34 +83,35 @@ Wayto.getAllWritingData = async (data)=>{
     });
 }
 
-Wayto.getArticles = async (data)=>{
-    if(!Filter.contains(data, defaultQuery)){
+Wayto.getArticles = async (data, admin = true)=>{
+    if(!Filter.contains(data, admin ? defaultQuery : ['bhid'])){
         return Channel.message({
             error: true,
             code: code.INVALID
         });
     }
-    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
+    if(admin && !(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
         return Channel.message({code: code.LOGOUT})
     }
+    const sponsored = set(data.article, '') === 'sponsored';
     if(!isset(data.artid)){
         return Channel.message({
             error: false,
             code: code.SUCCESS,
-            data: await Articles.fetchAll(data.bhid, true, false)
+            data: await Articles.fetchAll(data.bhid, true, sponsored, !admin)
         });
     }
     const article = await Articles.getById(data.artid);
-    if(article){
+    if(!article){
         return Channel.message({
-            error: false,
-            code: code.SUCCESS,
-            data: await article.data()
+            error: true,
+            code: code.INVALID
         });
     }
     return Channel.message({
-        error: true,
-        code: code.INVALID
+        error: false,
+        code: code.SUCCESS,
+        data: await article.data(!admin)
     });
 }
 
@@ -131,6 +154,19 @@ Wayto.getPunchlines = async (data)=>{
     });
 }
 
+//public
+Wayto.getSitePunchlines = async (data)=>{
+    const sponsored = set(data.article, '') === 'sponsored';
+    const meta = set(data.meta, false);
+    return Channel.message({
+        error: false,
+        code: code.SUCCESS,
+        data: {
+            punchlines: await Punchlines.fetchAll(data.bhid, true, true, sponsored)
+        }
+    })
+}
+
 Wayto.getPunchlinesConfig = async (data)=>{
     if(!Filter.contains(data, defaultQuery, [null,0,''])){
         return Channel.message({code: code.INVALID});
@@ -153,14 +189,12 @@ Wayto.getPunchlinesConfig = async (data)=>{
     });
 }
 
+//public
 Wayto.receiveMessage = async (data)=>{
     if(!Filter.contains(data, [
         'cli_fname', 'cli_lname', 'cli_mail', 'cli_msg','cli_bhid'
     ])){
         return Channel.message({code: code.INVALID});
-    }
-    if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
-        return Channel.message({code: code.LOGOUT})
     }
     let client = await Subscriber.getByEmail(data.cli_mail),
         saving;
@@ -186,6 +220,7 @@ Wayto.receiveMessage = async (data)=>{
     if(saving.error){
         return saving;
     }
+    Manager.broadcast('/new-contact-message', await saving.data.data(), data.cli_bhid);
     return Channel.message({
         error: false,
         code: code.SUCCESS
@@ -370,10 +405,14 @@ Wayto.getPrivileges = async (data)=>{
     if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) {
         return Channel.message({code: code.LOGOUT})
     }
+    const manager = await Manager.getById(data.cmid);
     return Channel.message({
         error: false,
         code: code.SUCCESS,
-        data: privileges
+        data: {
+            ...privileges,
+            own: manager.branches[data.bhid]
+        }
     });
 }
 
@@ -419,8 +458,13 @@ Wayto.integrateNewManager = async (data)=>{
     const update = 'id' in data;
     const selfRequest = update && data.id == data.cmid;
 
-    if(update && !selfRequest && !manager.hasAccess(402, data.bhid)) return Channel.message({code: code.INSUFFICIENT_PRIVILEGE});
-
+    if(update && (
+            (!selfRequest && !manager.hasAccess(402, data.bhid)) ||
+            (isset(data.privileges) && !manager.hasAccess(407, data.bhid))
+        )
+    ){
+        return Channel.message({code: code.INSUFFICIENT_PRIVILEGE});
+    }
 
     if(!update && (!isset(data.password) || !isset(data.privileges)) ){
         return Channel.message({code: code.INVALID});
@@ -444,7 +488,17 @@ Wayto.integrateNewManager = async (data)=>{
         manager.branches = data.privileges;
         manager.active = true;
     }
-    else if(isset(data.privileges)){
+    if(isset(data.privileges)){
+        for(let branch in data.privileges){
+            if(!(await Branch.getById(branch))){
+                return Channel.message({code: code.INVALID_BRANCH});
+            }
+            for(let privilege of data.privileges[branch]){
+                if(!(privilege in privileges.privileges)){
+                    return Channel.message({code: code.INVALID_PRIVILEGE});
+                }
+            }
+        }
         manager.branches = data.privileges;
     }
 

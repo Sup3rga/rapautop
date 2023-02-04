@@ -4,6 +4,7 @@ import Ressources from "../utils/Ressources";
 import Footer from "../components/Footer";
 import Url from "../utils/Url";
 import {Icon} from "../components/Header";
+import parser from "html-react-parser";
 
 export default class Reading extends React.Component{
 
@@ -17,9 +18,8 @@ export default class Reading extends React.Component{
         console.log('[URl]', this.data);
         this.state = {
             title: null,
-            text: null,
-            publishDate: null,
-            time: null,
+            content: null,
+            postOn: null,
             stats: [],
             author: null
         };
@@ -29,7 +29,6 @@ export default class Reading extends React.Component{
         setTimeout(()=>{
             Ressources.getArticleData(this.data.id)
             .then((e)=>{
-                console.log('[E]',e);
                 this.setState(e);
             });
         },1000);
@@ -53,22 +52,11 @@ export default class Reading extends React.Component{
                         }>
                             {
                                 skeleton ? '':
-                                    'Publié le '+ Ressources.getDateString(this.state.publishDate) + ', ' +this.state.time
+                                    'Publié le '+ Ressources.getDateString(this.state.postOn, false)
                             }
                         </div>
                     </div>
-                    <div className={
-                        "ui-container ui-size-fluid ui-image caption "+
-                        (skeleton ? 'skeleton' : '')
-                    } style={
-                        skeleton ? null :
-                            {
-                                backgroundImage: 'url('+this.state.caption+')'
-                            }
-                    }>
-
-                    </div>
-                    <div className="ui-container ui-size-fluid article-text">
+                    <div className="ui-element ui-size-fluid article-reader">
                         {
                             skeleton ?
                                 Ressources.range(0,Math.random() * 60 + 10).map((i,j)=>{
@@ -76,7 +64,7 @@ export default class Reading extends React.Component{
                                         width: (Math.random() * 100 + 10)+'%'
                                     }} key={j}/>;
                                 }) :
-                                this.state.text
+                                parser(this.state.content)
                         }
                     </div>
                 </div>

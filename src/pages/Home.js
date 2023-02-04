@@ -9,6 +9,7 @@ import Footer from "../components/Footer";
 import Drawer from "../components/Menu";
 import SearchPanel from "../components/SearchPanel";
 import {Punchline} from "./Punchlines";
+import parser from "html-react-parser";
 
 export default class Home extends React.Component{
     
@@ -22,33 +23,30 @@ export default class Home extends React.Component{
     }
 
     componentDidMount() {
-        setTimeout(()=>{
-
-            Ressources.getArticles().then((result)=>{
-                this.setState((state)=>{
-                    return {
-                        ...state,
-                        trending: result
-                    }
-                });
+        Ressources.getArticles().then((result)=>{
+            this.setState((state)=>{
+                return {
+                    ...state,
+                    trending: result
+                }
             });
-            Ressources.getSlidesData().then((result)=>{
-                this.setState((state)=>{
-                    return {
-                        ...state,
-                        slides: result
-                    }
-                });
+        });
+        Ressources.getSlidesData().then((result)=>{
+            this.setState((state)=>{
+                return {
+                    ...state,
+                    slides: result
+                }
             });
-            Ressources.getLastPunchLinesData().then((result)=>{
-                this.setState((state)=>{
-                    return {
-                        ...state,
-                        punchlines: result
-                    }
-                });
+        });
+        Ressources.getLastPunchLinesData().then((result)=>{
+            this.setState((state)=>{
+                return {
+                    ...state,
+                    punchlines: result
+                }
             });
-        },1000);
+        });
     }
 
     render(){
@@ -59,7 +57,7 @@ export default class Home extends React.Component{
                             this.state.slides.map((data, index) => {
                                 return <CarousselSlide skeleton={data.title === null} key={index} image={data.caption}>
                                     <h1 className="ui-element ui-size-fluid">{data.title}</h1>
-                                    <p className="ui-element ui-size-fluid">{data.text}</p>
+                                    <p className="ui-element ui-size-fluid">{Ressources.text(data.content)}</p>
                                     <button className="ui-element ui-button primary-theme">
                                         Lire la suite <Icon icon="long-arrow-alt-right"/>
                                     </button>
@@ -68,9 +66,9 @@ export default class Home extends React.Component{
                         }
                     </Caroussel>
                     <div className="ui-container ui-unwrap ui-column ui-md-row ui-horizontal-right ui-size-fluid article-thumb-space">
-                        <div className="article-container ui-container ui-horizontal-left ui-size-fluid ui-md-size-8">
+                        <div className="article-container ui-element ui-horizontal-left ui-size-fluid ui-md-size-8">
                             <h1 className="ui-element ui-size-fluid">Tendances</h1>
-                            <div className="ui-container ui-size-fluid trending">
+                            <div className="ui-element ui-size-fluid trending">
                                 {
                                     this.state.trending.map((data,index) =>{
                                         return <ArticleThumbnail
@@ -78,8 +76,8 @@ export default class Home extends React.Component{
                                             key={index}
                                             caption={data.caption}
                                             title={data.title}
-                                            subtitle={data.subtitle}
-                                            date={data.date}
+                                            subtitle={Ressources.text(data.content)}
+                                            date={Ressources.getDateString(data.postOn, false)}
                                         />
                                     })
                                 }

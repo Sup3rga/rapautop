@@ -353,6 +353,10 @@ $bottom-bar-height: 60px;
   }
 }
 
+.article-reader{
+  @extend %article-reading-view;
+}
+
 .empty-temp{
   padding: .4em;
   color: #777;
@@ -382,7 +386,7 @@ $bottom-bar-height: 60px;
     text-decoration: none;
     color: black;
     font-family: Roboto;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #ccc;
     border-top: 1px solid #eee;
     .caption{
       height: 20vmin;
@@ -397,28 +401,37 @@ $bottom-bar-height: 60px;
       .title{
         font-family: Lexend-Medium;
         font-size: 1.2em;
+        .category{
+          padding: .2em .4em;
+          background-color: #ccc;
+          margin: .2em .4em;
+          font-size: .8em;
+          border-radius: .4em;
+        }
       }
       .grid{
-        padding: .2em;
+        padding: .2em 0;
+        font-family: OpenSans;
+        font-size: .9em;
+        .dot{
+          display: inline-block;
+          width: 3px;
+          height: 3px;
+          border-radius: 3em;
+          background-color: #555;
+        }
         .item{
           padding: 0 .5em;
-          icon{
-            font-size: 1.2em;
-          }
           .label{
             padding: .2em;
             font-family: Poppins;
+            font-weight: bold;
           }
         }
       }
       .else{
-        padding: .3em 0;
-        label{
-          font-size: .9em;
-          font-family: Roboto-Light;
-        }
         span{
-          padding-left: .4em;
+          font-size: .9em;
         }
       }
     }

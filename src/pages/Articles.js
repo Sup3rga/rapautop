@@ -85,9 +85,9 @@ export default class Articles extends React.Component{
                                             id={article.id}
                                             skeleton={article.title === null}
                                             title={article.title}
-                                            text={article.subtitle}
+                                            text={Ressources.text(article.content)}
                                             caption={article.caption}
-                                            date={article.date}
+                                            date={article.postOn}
                                         />
                                     )
                                 })

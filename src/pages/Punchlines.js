@@ -8,7 +8,7 @@ import {Icon} from "../components/Header";
 export class Punchline extends React.Component{
     render() {
         let {data, className,onClick} = this.props,
-            skeleton = data.image == null;
+            skeleton = data.card == null;
         return (
             <div className={
                     "ui-element ui-image punchline " +
@@ -16,7 +16,7 @@ export class Punchline extends React.Component{
                     (skeleton ? 'skeleton' : '')
                 }
                 style={ skeleton ? null : {
-                    backgroundImage: 'url('+data.image+')'
+                    backgroundImage: 'url('+data.card+')'
                 }}
                 onClick={onClick}
             />

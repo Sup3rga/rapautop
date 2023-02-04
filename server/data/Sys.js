@@ -30,6 +30,12 @@ class Sys{
         }catch (e){
             Channel.logError(e);
         }
+        if(/^[0-9]+(\.[0-9]+)?$/.test(result)){
+            result *= 1;
+        }
+        else if(['false','true'].indexOf(result) >= 0){
+            result = result === 'true';
+        }
         return result;
     }
 }
