@@ -50,6 +50,10 @@ function serve(request, response, uploader){
     .serve(['avatar'], Wayto.uploadAvatar, [uploader])
     .serve(['articles', 'bhid'], Wayto.getArticles, [false])
     .serve(['punchlines', 'bhid'], Wayto.getSitePunchlines)
+    .serve(['cardid', 'bhid'], Wayto.watchPunchline)
+    .serve(['like_article', 'bhid'], Wayto.likeArticle)
+    .serve(['dislike_article', 'bhid'], Wayto.dislikeArticle)
+    .serve(['sector', 'bhid'], Wayto.getSiteCategories)
     .notFound();
 }
 

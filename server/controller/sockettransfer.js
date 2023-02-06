@@ -14,7 +14,7 @@ class SocketTransfer{
                 if (typeof response == 'function') {
                     return response.bind(this.socket, args);
                 }
-                this.socket.emit(response, await execution.apply(null, [...args, this.socket]));
+                this.socket.emit(response, await execution.apply(null, args));
             });
         }
         return this;

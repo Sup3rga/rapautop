@@ -16,7 +16,7 @@ export default class Articles extends React.Component{
         this.state = {
             categories: {},
             articles: Ressources.getArticlesFakeData(),
-            currentCategorie: "all",
+            currentCategorie: 0,
             seemore: false,
         };
     }
@@ -76,7 +76,8 @@ export default class Articles extends React.Component{
                                     if(article.title !== null){
                                         this.state.seemore = true;
                                     }
-                                    if([article.categorie, 'all'].indexOf(this.state.currentCategorie) < 0 && article.title !== null){
+                                    console.log('[Current]',this.state.currentCategorie, article.category);
+                                    if([article.category ? article.category.id : 0, 0].indexOf(this.state.currentCategorie * 1) < 0 && article.title !== null){
                                         return;
                                     }
                                     return (
@@ -94,14 +95,14 @@ export default class Articles extends React.Component{
                             }
                         </div>
                         {
-                            this.state.seemore ?
-                            <div className="ui-container ui-all-center ui-size-fluid">
-                                <button className="ui-element ui-button light" id="see-more-article">Voir plus <Icon icon="arrow-down"/></button>
-                            </div>:
+                            // this.state.seemore ?
+                            // <div className="ui-container ui-all-center ui-size-fluid">
+                            //     <button className="ui-element ui-button light" id="see-more-article">Voir plus <Icon icon="arrow-down"/></button>
+                            // </div>:
                             null
                         }
                     </div>
-                    <Footer />
+                    <Footer simple={true} />
                 </DefaultPage>
             </>
         )

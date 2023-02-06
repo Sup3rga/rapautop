@@ -474,6 +474,33 @@ footer{
   @extend %article-reading-view;
 }
 
+.feedback{
+  padding: .4em;
+  background-color: #eee;
+  border-left: 3px solid #ccc;
+  font-family: Poppins;
+  margin: .2em;
+  .message{
+    font-style: italic;
+    line-height: 1.2em;
+    padding: .4em 0;
+  }
+  .name{
+    position: relative;
+    padding: .2em .2em .2em 1.5em;
+    font-family: Merriweather;
+    &:before{
+      content: " ";
+      width: 1.2em;
+      height: 1px;
+      background-color: #333;
+      position: absolute;
+      left: 0;
+      top: 50%;
+    }
+  }
+}
+
 //Contact-us
 .contact-us{
   padding: .5em;

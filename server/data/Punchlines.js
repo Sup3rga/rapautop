@@ -18,6 +18,7 @@ class Punchlines extends TracableData{
         this.picture = 0; //base picture as punchline card background
         this.card = 0; //punchline card
         this.year = 0;
+        this.watches = 0;
         this.artist = null;
         this.lyrics = null;
         this.punchline = null;
@@ -51,6 +52,19 @@ class Punchlines extends TracableData{
         return data;
     }
 
+    async read(){
+        try{
+            await Pdo.prepare(`
+                update punchlines set watches=:p1 where id=:p2
+            `).execute({
+                p1: this.watches + 1,
+                p2: this.id
+            });
+        }catch (e){
+            Channel.logError(e)
+        }
+    }
+
     hydrate(data) {
         this.id = data.id;
         this.title = data.title;
@@ -60,6 +74,7 @@ class Punchlines extends TracableData{
         this.year = data.year;
         this.lyrics = data.lyrics;
         this.category = data.category;
+        this.watches = data.watches;
         this.artist = data.artist;
         this.comment = data.comment;
         this.branch = data.branch;
@@ -197,6 +212,11 @@ class Punchlines extends TracableData{
         return Channel.message({code: code.SUCCESS, error: false});
     }
 
+    /**
+     *
+     * @param id
+     * @returns {Promise<Punchlines>}
+     */
     static async getById(id){
         let punchline = null;
         try{

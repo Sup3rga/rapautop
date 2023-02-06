@@ -9,7 +9,13 @@ class Data{
     hydrate(data){
         return this;
     }
-    static async getById(){}
+
+    /**
+     *
+     * @param id
+     * @returns {Promise<null|Data>}
+     */
+    static async getById(id){}
     static async getLast(){}
     static async fetchAll(branch = 0, onlyData = true, _public = false){}
 }

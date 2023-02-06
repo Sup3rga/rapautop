@@ -4,6 +4,7 @@ import Field from "../components/Field";
 import Ressources from "../utils/Ressources";
 import Footer from "../components/Footer";
 import {Icon} from "../components/Header";
+import Filter from "../utils/Filter";
 
 export class Punchline extends React.Component{
     render() {
@@ -33,10 +34,13 @@ export default class Punchlines extends React.Component{
             gallery: [],
             total: null,
             current: null,
+            category: 0,
+            artist: 0,
+            year: 0,
             lists: {
-                categories: ['Tout'],
-                artists: ['Tout'],
-                years: ['Tout']
+                categories: {0: 'Toutes les catégories'},
+                artists: ['Tous les artistes'],
+                years: ['Toutes les années']
             }
         };
         for(let i = 0, j = Math.random() * 50 + 20; i < j; i++){
@@ -44,14 +48,28 @@ export default class Punchlines extends React.Component{
         }
     }
 
+    changeState(state){
+        this.setState(old => {
+            return {
+                ...old,
+                ...state
+            }
+        });
+    }
+
     componentDidMount() {
         setTimeout(()=>{
             Ressources.getPunchlinesData().then((result)=>{
-                this.setState(state => {
-                    return {
-                        ...state,
-                        total: result.length,
-                        gallery: result
+                this.changeState({
+                    total: result.punchlines.length,
+                    gallery: result.punchlines,
+                    lists: {
+                        categories: {
+                            ...this.state.lists.categories,
+                            ...Filter.toOptions(result.categories, 'id', 'name')
+                        },
+                        years: [...this.state.lists.years, ...result.years],
+                        artists: [...this.state.lists.artists, ...result.artists]
                     }
                 })
             })
@@ -63,15 +81,45 @@ export default class Punchlines extends React.Component{
             <div className="ui-container ui-size-fluid filter-zone">
                 <div className="ui-container ui-size-fluid ui-md-size-3 ui-unwrap wrapper ui-vertical-center">
                     <label className="ui-element">Catégorie</label>
-                    <Field type="select" className="ui-element ui-size-fluid field" options={this.state.lists.categories}/>
+                    <Field
+                        type="select"
+                        className="ui-element ui-size-fluid field"
+                        options={this.state.lists.categories}
+                        value={this.state.category}
+                        onChange={(e)=>{
+                            this.changeState({
+                                category: e.target.value
+                            });
+                        }}
+                    />
                 </div>
                 <div className="ui-container ui-size-fluid ui-md-size-3 ui-unwrap wrapper ui-vertical-center">
                     <label className="ui-element">Artiste</label>
-                    <Field type="select" className="ui-element ui-size-fluid field" options={this.state.lists.artists}/>
+                    <Field
+                        type="select"
+                        className="ui-element ui-size-fluid field"
+                        options={this.state.lists.artists}
+                        value={this.state.artist}
+                        onChange={(e)=>{
+                            this.changeState({
+                                artist: e.target.value
+                            });
+                        }}
+                    />
                 </div>
                 <div className="ui-container ui-size-fluid ui-md-size-3 ui-unwrap wrapper ui-vertical-center">
                     <label className="ui-element">Année</label>
-                    <Field type="select" className="ui-element ui-size-fluid field" options={this.state.lists.years}/>
+                    <Field
+                        type="select"
+                        className="ui-element ui-size-fluid field"
+                        options={this.state.lists.years}
+                        value={this.state.year}
+                        onChange={(e)=>{
+                            this.changeState({
+                                year: e.target.value
+                            });
+                        }}
+                    />
                 </div>
             </div>
         );
@@ -85,9 +133,17 @@ export default class Punchlines extends React.Component{
           }>
               {
                   this.state.gallery.map((data, index) => {
+                      if(
+                          (this.state.category > 0 && this.state.category != data.category) ||
+                          (this.state.year > 0 && this.state.lists.years[this.state.year] != data.year) ||
+                          (this.state.artist > 0 && this.state.lists.artists[this.state.artist] != data.artist)
+                      ){
+                          return null;
+                      }
                       return (
                           <div className="ui-element ui-size-4 ui-sm-size-3 ui-md-size-2 wrapper">
-                              <Punchline key={index} className="ui-size-fluid" data={data} onClick={(e)=>{
+                              <Punchline key={index} className="ui-size-fluid" data={data} onClick={()=>{
+                                  Ressources.watchPunchline(data.id);
                                   this.setState(state=>{
                                       return {
                                           ...state,
@@ -127,11 +183,11 @@ export default class Punchlines extends React.Component{
                     !current ? null : (
                         <>
                         <div className="ui-element ui-size-fluid image ui-image ui-height-8" style={{
-                            backgroundImage: 'url('+current.image+')'
+                            backgroundImage: 'url('+current.card+')'
                         }}/>
                         <div className="ui-container ui-size-fluid metadata">
                             <div className="ui-element ui-size-fluid title">
-                                {current.music}
+                                {current.title}
                             </div>
                             <div className="ui-element ui-size-fluid artist">
                                 {current.artist}
@@ -141,7 +197,7 @@ export default class Punchlines extends React.Component{
                                     <label>Année de sortie : </label> {current.year}
                                 </div>
                                 <div className="ui-element ui-size-6 year">
-                                    <label>Catégorie : </label> {current.category}
+                                    <label>Catégorie : </label> {this.state.lists.categories[current.category]}
                                 </div>
                             </div>
                             <div className="ui-element ui-size-fluid comment">

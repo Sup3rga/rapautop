@@ -5,6 +5,7 @@ import Footer from "../components/Footer";
 import Url from "../utils/Url";
 import {Icon} from "../components/Header";
 import parser from "html-react-parser";
+import {CircularProgress} from "@mui/material";
 
 export default class Reading extends React.Component{
 
@@ -15,23 +16,58 @@ export default class Reading extends React.Component{
             id: url[2],
             title: url[3].replace(/\+/g,' ')
         };
-        console.log('[URl]', this.data);
+        this.likes = Ressources.getLocalStorage('likedArticles', true);
+        this.dislikes = Ressources.getLocalStorage('dislikedArticles', true);
         this.state = {
+            id: 0,
             title: null,
             content: null,
             postOn: null,
             stats: [],
-            author: null
+            author: null,
+            rated: false,
+            like: false,
+            pending: false,
         };
     }
 
     componentDidMount() {
-        setTimeout(()=>{
-            Ressources.getArticleData(this.data.id)
-            .then((e)=>{
-                this.setState(e);
-            });
-        },1000);
+        Ressources.getArticleData(this.data.id)
+        .then((e)=>{
+            this.setState(e);
+        });
+    }
+
+    changeState(state){
+        this.setState(old => {
+            return {
+                ...old,
+                ...state
+            }
+        });
+    }
+
+    async rate(positive){
+        this.changeState({
+            pending: true,
+            like: positive
+        });
+        let rated = false;
+        if(await Ressources.rateArticle(this.state.id, positive)){
+            rated = true;
+            if(positive) {
+                this.likes.push(this.state.id);
+                Ressources.setLocalStorage('likedArticles', this.likes);
+            }
+            else{
+                this.dislikes.push(this.state.id);
+                Ressources.setLocalStorage('dislikedArticles', this.dislikes);
+            }
+        }
+        this.changeState({
+            pending: false,
+            rated
+        });
     }
 
     renderArticle(){
@@ -87,22 +123,68 @@ export default class Reading extends React.Component{
                 </div>
                 :
                 <div className="ui-container ui-size-fluid appreciation ui-vertical-center">
-                    <span className="ui-container ui-size-fluid ui-sm-size-6 ui-md-size-4 text">
-                        Vous avez aimé cet article ?
-                    </span>
-                    <button className="ui-element ui-button primary-theme">
-                        <Icon icon="thumbs-up"/>
-                        J'ai apprécié !
-                    </button>
-                    <button className="ui-element ui-button ui-alert-theme ui-text-clipped">
-                        <Icon icon="grin-wink"/>
-                        J'espérais mieux
-                    </button>
+                    {
+                        this.likes.indexOf(this.state.id) >= 0 ||
+                        this.dislikes.indexOf(this.state.id) >= 0 ?
+                            <div className="ui-container feedback">
+                                <div className="ui-container ui-size-fluid message">
+                                    {this.likes.indexOf(this.state.id) >= 0 ?
+                                        `
+                                        Nous vous remercions pour votre appréciation ! C'est un plaisir 
+                                        d'écrire pour des gens comme vous !    
+                                        `:
+                                        `
+                                        Votre note nous sera très utile, merci de nous avoir fait
+                                        connaître votre avis.
+                                        `
+                                    }
+                                </div>
+                                <div className="ui-container ui-size-fluid name">
+                                    De la redaction
+                                </div>
+                            </div>:
+                            <>
+                                <span className="ui-container ui-size-fluid ui-sm-size-6 ui-md-size-4 text">
+                                    Vous avez aimé cet article ?
+                                </span>
+                                <button
+                                    disabled={this.state.pending}
+                                    className={
+                                        "ui-element ui-button primary-theme "+
+                                        (this.state.pending && !this.state.like ? 'ui-disabled' : '')
+                                    }
+                                    onClick={()=>this.rate(true)}
+                                >
+                                    {
+                                        this.state.pending && this.state.like ?
+                                            <CircularProgress size="18px" sx={{color: 'white'}}/> :
+                                            <Icon icon="thumbs-up"/>
+                                    }
+                                    J'ai apprécié !
+                                </button>
+                                <button
+                                    disabled={this.state.pending}
+                                    className={
+                                        "ui-element ui-button ui-alert-theme ui-text-clipped "+
+                                        (this.state.pending && this.state.like ? 'ui-disabled' : '')
+                                    }
+                                    onClick={()=>this.rate(false)}
+                                >
+                                    {
+                                        this.state.pending && !this.state.like ?
+                                            <CircularProgress size="18px" sx={{color: 'white'}}/> :
+                                            <Icon icon="grin-wink"/>
+                                    }
+                                    J'espérais mieux
+                                </button>
+                            </>
+                    }
                 </div>
         );
     }
 
     render() {
+        console.log('[THis]',this);
         return (
             <DefaultPage title={this.data.title}>
                 {this.renderArticle()}

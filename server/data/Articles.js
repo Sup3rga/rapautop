@@ -293,6 +293,46 @@ class Articles extends SponsoredData{
         return Channel.message({error: false, code: code.SUCCESS});
     }
 
+    async updateStats(metadata, value){
+        try{
+            await Pdo.prepare(`
+                update articles set ${metadata}=:p1 where id=:p2
+            `).execute({
+                p1: value,
+                p2: this.id
+            });
+            return Channel.message({
+                error: false,
+                code: code.SUCCESS
+            });
+        }catch (e){
+            return Channel.logError(e).message({code: code.INTERNAL});
+        }
+    }
+
+    async read(){
+        const req = await this.updateStats('reading', this.reading+1);
+        if(!req.error){
+            this.reading++;
+        }
+    }
+
+    async like(){
+        const req = await this.updateStats('likes', this.likes+1);
+        if(!req.error){
+            this.likes++;
+        }
+        return req;
+    }
+
+    async dislike(){
+        const req = await this.updateStats('dislikes', this.likes+1);
+        if(!req.error){
+            this.dislikes++;
+        }
+        return req;
+    }
+
     async sponsorUntil(date){
         date = new AkaDatetime(date);
         if(!this.id) return Channel.message({code: code.INVALID});

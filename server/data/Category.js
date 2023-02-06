@@ -72,14 +72,16 @@ class Category extends TracableData{
         return this;
     }
 
-    async data(){
+    async data(_public = false){
         const data = Filter.object(this, [
-            'id', 'name', 'createdBy','createdAt',
-            'modifiedAt','modifiedBy', 'branch',
-            'sector'
+            'id', 'name',
+            'sector',
+            ...(_public ? [] : ['createdBy','createdAt', 'modifiedAt','modifiedBy', 'branch'])
         ]);
-        data.createdBy = await (await Manager.getById(data.createdBy)).data(true, false, true);
-        data.modifiedBy = await (await Manager.getById(data.modifiedBy)).data(true, false, true);
+        if(!_public) {
+            data.createdBy = await (await Manager.getById(data.createdBy)).data(true, false, true);
+            data.modifiedBy = await (await Manager.getById(data.modifiedBy)).data(true, false, true);
+        }
         return data;
     }
 
@@ -97,10 +99,11 @@ class Category extends TracableData{
         return Channel.message({error: false, code: code.SUCCESS});
     }
 
-    static async fetchAll(branch,type = 'A', dataOnly = true){
+    static async fetchAll(branch,type = 'A', dataOnly = true,_public=false, includeEmpty=true){
         let  result = [];
         try {
-            let req = await Pdo.prepare("select * from category where attached_to=:p1 and branch=:p2")
+            let filter = includeEmpty ? '': ` and (select count(*) from ${type === 'A' ? 'articles' : 'punchlines'} where category = c.id) > 0`;
+            let req = await Pdo.prepare("select c.* from category c where c.attached_to=:p1 and c.branch=:p2"+filter)
                                 .execute({
                                     p1: type,
                                     p2: branch
@@ -110,7 +113,7 @@ class Category extends TracableData{
                 while(data = req.fetch()) {
                     res = new Category().hydrate(data);
                     if(dataOnly){
-                        res = await res.data();
+                        res = await res.data(_public);
                     }
                     result.push(res);
                 }

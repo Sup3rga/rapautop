@@ -59,6 +59,7 @@ Wayto.getAllCategories = async (data, sector='A')=>{
         return Channel.message({code: code.INVALID});
     }
     if(!(await Manager.checkAuthentification(data.cmid, data.cmtk))) return Channel.message({code: code.LOGOUT})
+    console.log('[Look For]',sector);
     return Channel.message({
         error: false,
         code: code.SUCCESS,
@@ -108,10 +109,50 @@ Wayto.getArticles = async (data, admin = true)=>{
             code: code.INVALID
         });
     }
+    await article.read();
+    if(!admin){
+        Manager.broadcast('/article-data-update', await article.data(), data.bhid * 1);
+    }
     return Channel.message({
         error: false,
         code: code.SUCCESS,
         data: await article.data(!admin)
+    });
+}
+
+//public
+Wayto.rateArticle = async (id, branch, positive)=>{
+    const article = await Articles.getById(id);
+    if(!article) return Channel.message({code: code.INVALID});
+
+    if(article.branch != branch) return Channel.message({code: code.BRANCH_ERROR});
+
+    const updating =  await article[positive ? 'like' : 'dislike']();
+    if(!updating.error){
+        Manager.broadcast('/article-data-update', await article.data(), branch * 1);
+    }
+    return updating;
+}
+
+//public
+Wayto.likeArticle = async (data)=>{
+    return Wayto.rateArticle(data.like_article, data.bhid, true)
+}
+
+//public
+Wayto.dislikeArticle = async (data)=>{
+    return Wayto.rateArticle(data.dislike_article, data.bhid, false)
+}
+
+//public
+Wayto.getSiteCategories = async (data)=>{
+    if(['articles', 'punchlines'].indexOf(data.sector) < 0){
+        return Channel.message({code: code.INVALID});
+    }
+    return Channel.message({
+        error: false,
+        code: code.SUCCESS,
+        data: await Category.fetchAll(data.bhid, data.sector == 'articles' ? 'A' : 'P', true, true, false)
     });
 }
 
@@ -162,9 +203,25 @@ Wayto.getSitePunchlines = async (data)=>{
         error: false,
         code: code.SUCCESS,
         data: {
-            punchlines: await Punchlines.fetchAll(data.bhid, true, true, sponsored)
+            punchlines: await Punchlines.fetchAll(data.bhid, true, true, sponsored),
+            ...(!meta ? {} : {
+                years: await Punchlines.fetchYears(data.bhid),
+                artists: await Punchlines.fetchArtists(data.bhid),
+                categories: await Category.fetchAll(data.bhid, 'P', true, true, false)
+            })
         }
     })
+}
+
+//public
+Wayto.watchPunchline = async (data)=>{
+    const punchline = await Punchlines.getById(data.cardid);
+    if(!punchline) return Channel.message({code: code.INVALID});
+    await punchline.read();
+    return Channel.message({
+        error: false,
+        code: code.SUCCESS
+    });
 }
 
 Wayto.getPunchlinesConfig = async (data)=>{
